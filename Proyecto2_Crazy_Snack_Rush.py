@@ -497,7 +497,7 @@ class Chef:
 ##########################
 ##########################
 
-#######
+##########################
         # Función que permite mover el chef hacia abajo
         def mover_abajo(self):
 
@@ -520,7 +520,7 @@ class Chef:
 ##########################
 ##########################
                 
-#######
+##########################
         # Función que permite mover el chef hacia la izquierda
         def mover_izquierda(self):
 
@@ -543,7 +543,7 @@ class Chef:
 ##########################
 #########################
 
-#######
+##########################
         # Función que permite mover el chef hacia la derecha
         def mover_derecha(self):
 
@@ -565,6 +565,102 @@ class Chef:
                 self.mostrar_posicion()
 ##########################
 #########################
+
+#######################################################################################
+
+#Clase que guarda toda la información de los ingredienes de la cocina americana
+class ingredientes_restaurante_americano:
+
+        # Constructor de la clase Ingrediente
+        def __init__(self, canvas_ingredientes, base_dir, nombre_ingrediente, archivo_imagen):
+
+                # Guarda el canvas donde se dibujarán los ingredientes
+                self.canvas_ingredientes = canvas_ingredientes
+
+                # Se define la ruta donde se almacenará las imagenes de los ingredientes 
+                self.BASE_DIR = base_dir
+
+                # Variable que guarda el nombre del ingrediente (zanahoria, tomate, queso, etc.)
+                self.nombre_ingrediente = nombre_ingrediente
+
+                # Guarda el nombre del archivo de imagen
+                self.archivo_imagen = archivo_imagen
+
+                # Aquí se almacenará el objeto gráfico creado en el canvas
+                self.objeto_canvas = None
+
+                # Construye la ruta completa de la imagen
+                ruta_imagen = os.path.join(self.BASE_DIR,"Imagenes",self.archivo_imagen)
+
+                # Se abre la ruta donde esta almacenadas la imagen de los ingredientes
+                imagen = Image.open(ruta_imagen)
+
+                # Tamaño que tendrá la imagenes de los ingredientes 
+                imagen = imagen.resize((40, 40))
+
+                # Convierte la imagen en un formato que Tkinter pueda usar
+                self.imagen_tk = ImageTk.PhotoImage(imagen)
+
+##########################
+
+        # Función que coloca el ingrediente sobre la cabeza del chef
+        def tomar_ingrediente(self, chef):
+
+                # Si ya existe una imagen del ingrediente encima de l la elimina
+                if self.objeto_canvas != None:
+
+                        self.canvas_ingredientes.delete(self.objeto_canvas)
+
+                # Crea la imagen del ingrediente encima del chef
+                self.objeto_canvas = self.canvas_ingredientes.create_image(
+                                                                                chef.chef_ejex, #Posición actual del chef en el eje x 
+                                                                                chef.chef_ejey - 80,   # Coloca la imagen 40 píxeles arriba de la cabeza del chef
+                                                                                image=self.imagen_tk # Se utiliza la imagen del ingrediente que fue cargada previamente
+                                                                                )
+##########################
+
+        # Función que hace que el ingrediente siga al chef cuando camina
+        def mover_ingrediente_con_chef(self, chef):
+
+                # Verifica que exista un ingrediente dibujado
+                if self.objeto_canvas != None:
+
+                # Mueve la imagen del ingrediente junto con el chef
+                        #Se obtiene las coordenas del chef 
+                        self.canvas_ingredientes.coords(
+                                                self.objeto_canvas,#Referencia del objeto o ingrediente que se esta usando 
+                                                chef.chef_ejex, #Se coloca el ingrediente del chef en el eje x 
+                                                chef.chef_ejey - 80 #Se coloca el ingrediente arriba de la cabeza del chef 
+                                                )
+
+##########################
+
+        # Elimina el ingrediente de las manos del chef
+        def soltar_ingrediente(self):
+
+                # Se verifica si el chef ya tiene un ingrediente sobre su cabeza
+                if self.objeto_canvas != None:
+
+                        # Se elimina la imagen del ingrediente que tiene el chef actualmente 
+                        self.canvas_ingredientes.delete(self.objeto_canvas)
+
+                        # Se actualiza el chef, porque ya no está cargando el ingrediente
+                        self.objeto_canvas = None
+
+##########################
+
+        # Función que devuelve la posición actual del ingrediente
+        def obtener_posicion_ingrediente(self):
+
+                # Se valida que el chef tenga un ingrediente seleccionado 
+                if self.objeto_canvas != None:
+
+                        # Se obtiene las coordenadas X,Y del ingrediente
+                        return self.canvas_ingredientes.coords(self.objeto_canvas)
+
+                else: 
+                        # Si no existe devuelve None
+                        return None
 
 #######################################################################################
 
@@ -609,6 +705,9 @@ class Pantalla_Restaurante_Americano:
 
                 # Se coloca la imagen de fondo en el canvas
                 self.canvas.create_image(0, 0, image=self.imagen_cocina_tk, anchor=NW)
+
+                # Detecta cuando el jugador presiona la tecla A
+                self.ventana_restaurante.bind("a", self.tomar_zanahoria)
 
 #######
                 # Matriz que permite el movimiento en el  restaurante americano 
@@ -669,11 +768,24 @@ class Pantalla_Restaurante_Americano:
                 # Se crea el objeto chef dentro del restaurante americano
                 self.chef = Chef(self.canvas, self.BASE_DIR, "Jugador 1", 500, 350)
 
+                # Se guarda el ingrediente que el chef está sosteniendo actualmente
+                self.ingrediente_en_mano = None
+
+                # Crea el ingrediente zanahoria del restaurante americano
+                self.zanahoria = ingredientes_restaurante_americano(
+                                                                        self.canvas, # Canvas donde se dibujará la imagen de la zanahoria
+                                                                        self.BASE_DIR, #Ruta donde se encuentra la carpeta de las imagenes 
+                                                                        "Zanahoria",# Nombre del ingrediente que se va a usar  
+                                                                        "zanahoria.png" #Nombre de la imagen del ingrediente 
+                                                                )
+
                 # Permite que la ventana del restaurante detecte las teclas
                 self.ventana_restaurante.focus_force()
 
                 # Detecta cuando el usuario presiona cualquier tecla de dirección 
                 self.ventana_restaurante.bind("<Key>", self.mover_chef)
+
+
 
 #########################################
 
@@ -770,10 +882,30 @@ class Pantalla_Restaurante_Americano:
 
                                         # Se mueve el chef hacia la derecha
                                         self.chef.mover_derecha()
+
+                                # Se verifica si el chef está cargando un ingrediente
+                                if self.ingrediente_en_mano != None:
+
+                                        # Se mueve el ingrediente junto con el chef para simular que lo está cargando
+                                        self.ingrediente_en_mano.mover_ingrediente_con_chef(self.chef)
+
                                 
                         #Movimiento no válido
                         else: 
                                 print ("Movimiento no válido")
+
+##########################
+        # Función que permite el ingrediente zanahoria
+        def tomar_zanahoria(self, event):
+
+                # Verifica que el chef no tenga otro ingrediente en la mano
+                if self.ingrediente_en_mano == None:
+
+                        # Se coloca la zanahoria encima del chef
+                        self.zanahoria.tomar_ingrediente(self.chef)
+
+                        # Se guarda la acción de que el chef ahora está cargando una zanahoria
+                        self.ingrediente_en_mano = self.zanahoria
                 
 
 ##########################################
