@@ -706,8 +706,8 @@ class Pantalla_Restaurante_Americano:
                 # Se coloca la imagen de fondo en el canvas
                 self.canvas.create_image(0, 0, image=self.imagen_cocina_tk, anchor=NW)
 
-                # Detecta cuando el jugador presiona la tecla A
-                self.ventana_restaurante.bind("a", self.tomar_zanahoria)
+                # Detecta cuando el jugador presiona la tecla A que permite tomar los ingredientes
+                self.ventana_restaurante.bind("a", self.escoger_ingrediente_americano)
 
 #######
                 # Matriz que permite el movimiento en el  restaurante americano 
@@ -771,20 +771,128 @@ class Pantalla_Restaurante_Americano:
                 # Se guarda el ingrediente que el chef está sosteniendo actualmente
                 self.ingrediente_en_mano = None
 
+#######
+
+                # Se crea el ingrediente carne del restaurante americano
+                self.carne = ingredientes_restaurante_americano(
+                                                                        self.canvas,       # Canvas donde se dibujará la imagen de la carne
+                                                                        self.BASE_DIR,     # Ruta donde se encuentra la carpeta de las imagenes
+                                                                        "Carne",           # Nombre del ingrediente que se va a usar 
+                                                                        "carne.png"        # Imagen de la carne
+                                                                        )
+                
+
+#######
+
+                # Se crea el ingrediente remolacha del restaurante americano
+                self.remolacha = ingredientes_restaurante_americano(
+                                                                        self.canvas,          # Canvas donde se dibujará la imagen de la remolacha
+                                                                        self.BASE_DIR,        # Ruta donde se encuentra la carpeta de las imagenes
+                                                                        "Remolacha",           # Nombre del ingrediente que se va a usar 
+                                                                        "remolacha.png"        # Imagen de la remolacha
+                                                                        )
+                
+
+
+#######
+                # Se crea el ingrediente calabaza del restaurante americano
+                self.hongo = ingredientes_restaurante_americano(
+                                                                        self.canvas,          # Canvas donde se dibujará la imagen de la calabaza
+                                                                        self.BASE_DIR,        # Ruta donde se encuentra la carpeta de las imagenes
+                                                                        "Calabaza",           # Nombre del ingrediente que se va a usar 
+                                                                        "hongo.png"        # Imagen de la calabaza
+                                                                        )
+                
+#######
+                # Se crea el ingrediente calabaza del restaurante americano
+                self.calabaza = ingredientes_restaurante_americano(
+                                                                        self.canvas,          # Canvas donde se dibujará la imagen de la calabaza
+                                                                        self.BASE_DIR,        # Ruta donde se encuentra la carpeta de las imagenes
+                                                                        "Calabaza",           # Nombre del ingrediente que se va a usar 
+                                                                        "calabaza.png"        # Imagen de la calabaza
+                                                                        )
+                
+        
+#######
                 # Crea el ingrediente zanahoria del restaurante americano
                 self.zanahoria = ingredientes_restaurante_americano(
                                                                         self.canvas, # Canvas donde se dibujará la imagen de la zanahoria
                                                                         self.BASE_DIR, #Ruta donde se encuentra la carpeta de las imagenes 
                                                                         "Zanahoria",# Nombre del ingrediente que se va a usar  
-                                                                        "zanahoria.png" #Nombre de la imagen del ingrediente 
+                                                                        "zanahoria.png" # Imagen de la zanahoria
+                                                                )
+                
+#######
+
+                # Se crea el ingrediente papa del restaurante americano
+                self.papa = ingredientes_restaurante_americano(
+                                                                        self.canvas,          # Canvas donde se dibujará la imagen de la papa
+                                                                        self.BASE_DIR,        # Ruta donde se encuentra la carpeta de imágenes
+                                                                        "Papa",               # Nombre del ingrediente que se va a usar
+                                                                        "papa.png"            # Imagen de la papa
+                                                                )
+                
+#######
+
+                # Se crea el ingrediente tomate del restaurante americano
+                self.tomate = ingredientes_restaurante_americano(
+                                                                        self.canvas,          # Canvas donde se dibujará la imagen del tomate
+                                                                        self.BASE_DIR,        # Ruta donde se encuentra la carpeta de imágenes
+                                                                        "Tomate",             # Nombre del ingrediente
+                                                                        "tomate.png"          # Imagen del tomate
                                                                 )
 
+#######
+
+                # Se crea el ingrediente mayonesa del restaurante americano
+                self.mayonesa = ingredientes_restaurante_americano(
+                                                                        self.canvas,          # Canvas donde se dibujará la imagen de la mayonesa
+                                                                        self.BASE_DIR,        # Ruta donde se encuentra la carpeta de imágenes
+                                                                        "Mayonesa",             # Nombre del ingrediente
+                                                                        "mayonesa.png"          # Imagen de la mayonesa
+                                                                )
+#######
+                # Se crea el ingrediente queso del restaurante americano
+                self.queso = ingredientes_restaurante_americano(
+                                                                        self.canvas,          # Canvas donde se dibujará la imagen del queso
+                                                                        self.BASE_DIR,        # Ruta donde se encuentra la carpeta de imágenes
+                                                                        "Queso",             # Nombre del ingrediente
+                                                                        "queso.png"          # Imagen del queso
+                                                                )
+                
+#######
+                # Se crea el ingrediente lentejas del restaurante americano
+                self.lentejas = ingredientes_restaurante_americano(
+                                                                        self.canvas,          # Canvas donde se dibujará la imagen de las lentejas
+                                                                        self.BASE_DIR,        # Ruta donde se encuentra la carpeta de imágenes
+                                                                        "Lentejas",             # Nombre del ingrediente
+                                                                        "lentejas.png"          # Imagen de las lentejas
+                                                                )
+
+#######
+
+                # Se crea el ingrediente cebolla del restaurante americano
+                self.cebolla = ingredientes_restaurante_americano(
+                                                                        self.canvas,          # Canvas donde se dibujará la imagen de las cebollas
+                                                                        self.BASE_DIR,        # Ruta donde se encuentra la carpeta de imágenes
+                                                                        "Cebolla",             # Nombre del ingrediente
+                                                                        "cebolla.png"          # Imagen de las cebollas
+                                                                )
+#######
+                # Se crea el ingrediente aceiturna del restaurante americano
+                self.aceituna = ingredientes_restaurante_americano(
+                                                                        self.canvas,          # Canvas donde se dibujará la imagen de las aceitunas
+                                                                        self.BASE_DIR,        # Ruta donde se encuentra la carpeta de imágenes
+                                                                        "Aceituna",             # Nombre del ingrediente
+                                                                        "aceituna.png"          # Imagen de las aceitunas
+                                                                )
+
+#######
                 # Permite que la ventana del restaurante detecte las teclas
                 self.ventana_restaurante.focus_force()
 
                 # Detecta cuando el usuario presiona cualquier tecla de dirección 
                 self.ventana_restaurante.bind("<Key>", self.mover_chef)
-
 
 
 #########################################
@@ -895,18 +1003,102 @@ class Pantalla_Restaurante_Americano:
                                 print ("Movimiento no válido")
 
 ##########################
-        # Función que permite el ingrediente zanahoria
-        def tomar_zanahoria(self, event):
 
-                # Verifica que el chef no tenga otro ingrediente en la mano
-                if self.ingrediente_en_mano == None:
+        # Función que determina qué ingrediente debe tomar el chef
+        def escoger_ingrediente_americano(self, event):
 
-                        # Se coloca la zanahoria encima del chef
-                        self.zanahoria.tomar_ingrediente(self.chef)
+                # Se obtiene la fila actual del chef
+                fila = self.chef.chef_ejey // 50
 
-                        # Se guarda la acción de que el chef ahora está cargando una zanahoria
-                        self.ingrediente_en_mano = self.zanahoria
-                
+                # Se obtiene la columna actual del chef
+                columna = self.chef.chef_ejex // 50
+
+                # Se guarda la posición actual del chef
+                posicion_chef = (fila, columna)
+
+                # Si el chef tiene un ingrediente en la mano lo cambia por el nuevo
+                if self.ingrediente_en_mano != None:
+
+                        # Se elimina el ingrediente actual
+                        self.ingrediente_en_mano.soltar_ingrediente()
+
+                        # Libera la mano del chef
+                        self.ingrediente_en_mano = None
+
+                # Diccionario con las posiciones donde el chef puede tomar ingredientes
+                estantes_ingredientes = {
+
+                        # Carne
+                        (3, 4): self.carne,
+                        #(3, 5): self.carne,
+
+                        # Remolacha
+                        (4, 4): self.remolacha,
+                        #(4, 5): self.remolacha,
+
+                        # Hongo
+                        (5, 4): self.hongo,
+                        (5, 5): self.hongo,
+
+                        # Calabaza
+                        (6, 4): self.calabaza,
+                        (6, 5): self.calabaza,
+
+                        # Zanahoria
+                        (7, 4): self.zanahoria,
+                        (7, 5): self.zanahoria,
+
+                        # Papa
+                        (8, 4): self.papa,
+                        (8, 5): self.papa,
+
+                        # Tomate
+                        #(3, 15): self.tomate,
+                        (3, 16): self.tomate,
+
+                        # Mayonesa
+                        #(4, 15): self.mayonesa,
+                        (4, 16): self.mayonesa,
+
+                        # Queso
+                        (5, 15): self.queso,
+                        (5, 16): self.queso,
+
+                        # lentejas
+                        (6, 15): self.lentejas,
+                        (6, 16): self.lentejas,
+
+                        # cebolla
+                        (7, 15): self.cebolla,
+                        (7, 16): self.cebolla,
+
+                        # aceituna
+                        (8, 15): self.aceituna,
+                        (8, 16): self.aceituna,
+
+
+                }
+
+             
+                # Se verifica si la posición actual del chef está en algún estante
+                if posicion_chef in estantes_ingredientes:
+
+                        # Obtiene el ingrediente según la posición del chef
+                        ingrediente = estantes_ingredientes[posicion_chef]
+
+                        # Coloca el ingrediente sobre el chef
+                        ingrediente.tomar_ingrediente(self.chef)
+
+                        # Guarda el ingrediente actual
+                        self.ingrediente_en_mano = ingrediente
+
+                        # Muestra cuál ingrediente tomó
+                        print(ingrediente.nombre_ingrediente, "tomado")
+
+                else:
+
+                        print("No hay ingrediente para tomar")
+                                
 
 ##########################################
 
