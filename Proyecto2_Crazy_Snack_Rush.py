@@ -347,7 +347,8 @@ class puntoMapa:
                                 )
         
 #######################################################################################
-# Clase asociada a la funcionaldiades del chef dentro del restaurante
+
+# Clase asociada a la funcionaldiades del chef #1 dentro del restaurante
 class Chef:
 
         def __init__(self, canvas, base_dir,nombre,chef_ejex, chef_ejey):
@@ -374,7 +375,7 @@ class Chef:
                 self.distancia = 50
 
 ########
-                # Ruta de la imagen del chef viendo hacia abajo
+                # Ruta de la imagen del chef#1 viendo hacia abajo
                 ruta_chef_abajo = os.path.join(
                                                 self.BASE_DIR,
                                                 "Imagenes",
@@ -391,7 +392,7 @@ class Chef:
                 self.imagen_abajo_tk = ImageTk.PhotoImage(imagen_chef_abajo)
 
 ########
-                # Ruta de la imagen del chef viendo hacia arriba
+                # Ruta de la imagen del chef#1 viendo hacia arriba
                 ruta_chef_arriba = os.path.join(
                                                 self.BASE_DIR,
                                                 "Imagenes",
@@ -408,7 +409,7 @@ class Chef:
                 self.imagen_arriba_tk = ImageTk.PhotoImage(imagen_chef_arriba)
 
 ########
-                # Ruta de la imagen del chef viendo hacia la izquierda
+                # Ruta de la imagen del chef#1 viendo hacia la izquierda
                 ruta_chef_izquierda = os.path.join(
                                                         self.BASE_DIR,
                                                         "Imagenes",
@@ -568,6 +569,221 @@ class Chef:
 
 #######################################################################################
 
+# Clase asociada a la funcionaldiades del chef #2 dentro del restaurante
+class Chef2:
+
+        def __init__(self, canvas, base_dir, nombre, chef_ejex, chef_ejey):
+
+                self.canvas = canvas
+                self.BASE_DIR = base_dir
+                self.nombre = nombre
+                self.puntos = 0
+
+                self.chef_ejex = chef_ejex
+                self.chef_ejey = chef_ejey
+
+                self.distancia = 50
+
+########
+                # Ruta de la imagen del chef#2 viendo hacia abajo
+                ruta_chef_abajo = os.path.join(
+                                                self.BASE_DIR,
+                                                "Imagenes",
+                                                "chef2_abajo.png"
+                                                )
+
+                # Se abre la ruta que contiene la imagen del chef 
+                imagen_chef_abajo = Image.open(ruta_chef_abajo)
+
+                # Se ajusta el tamaño de la imagen del chef
+                imagen_chef_abajo = imagen_chef_abajo.resize((70,100))
+
+                # Se convierte la imagen del chef en un formato que usa tkinter 
+                self.imagen_abajo_tk = ImageTk.PhotoImage(imagen_chef_abajo)
+
+########
+                # Ruta de la imagen del chef viendo hacia arriba
+                ruta_chef_arriba = os.path.join(
+                                                self.BASE_DIR,
+                                                "Imagenes",
+                                                "chef2_arriba.png"
+                                                )
+                
+                # Se abre la ruta que contiene la imagen del chef 
+                imagen_chef_arriba = Image.open(ruta_chef_arriba)
+
+                # Se ajusta el tamaño de la imagen del chef
+                imagen_chef_arriba = imagen_chef_arriba.resize((70,100))
+
+                # Se convierte la imagen del chef en un formato que usa tkinter 
+                self.imagen_arriba_tk = ImageTk.PhotoImage(imagen_chef_arriba)
+
+########
+                # Ruta de la imagen del chef viendo hacia la izquierda
+                ruta_chef_izquierda = os.path.join(
+                                                        self.BASE_DIR,
+                                                        "Imagenes",
+                                                        "chef2_izquierda.png"
+                                                )
+
+                # Se abre la ruta que contiene la imagen del chef
+                imagen_chef_izquierda = Image.open(ruta_chef_izquierda)
+
+                # Se ajusta el tamaño de la imagen del chef
+                imagen_chef_izquierda = imagen_chef_izquierda.resize((70,100))
+
+                # Se convierte la imagen del chef en un formato que usa tkinter 
+                self.imagen_izquierda_tk = ImageTk.PhotoImage(imagen_chef_izquierda)
+
+########
+
+                # Ruta de la imagen del chef viendo hacia la derecha
+                ruta_chef_derecha = os.path.join(
+                                                self.BASE_DIR,
+                                                "Imagenes",
+                                                "chef2_derecha.png"
+                                                )
+
+                # Se abre la ruta que contiene la imagen del chef
+                imagen_chef_derecha = Image.open(ruta_chef_derecha)
+
+                # Se ajusta el tamaño
+                imagen_chef_derecha = imagen_chef_derecha.resize((70,100))
+
+                # Se convierte la imagen para tkinter
+                self.imagen_derecha_tk = ImageTk.PhotoImage(imagen_chef_derecha)
+
+########
+                # Se coloca inicialmente el chef viendo hacia abajo
+                self.chef_canvas = self.canvas.create_image(
+                                                                self.chef_ejex,
+                                                                self.chef_ejey,
+                                                                image=self.imagen_abajo_tk
+                                                        )
+
+
+
+        ##########################
+##########################
+
+        # Función que muestra en consola la posición actual del chef (se utilizará para ver cuanto se puede mover el chef en el restaurante)
+        def mostrar_posicion(self):
+
+                # Se imprime la posición actual del chef en X y Y
+                print( "X =", self.chef_ejex,"Y =", self.chef_ejey)
+
+                # Se convierte la posición X del chef en columna de la matriz
+                columna = self.chef_ejex // 50 # se divide entre 50 porque es el tamaño que tiene cada cuadro en la matriz 
+
+                # Se convierte la posición Y del chef en fila de la matriz
+                fila = self.chef_ejey // 50 # se divide entre 50 porque es el tamaño que tiene cada cuadro en la matriz 
+
+                # Se muestra la posición en pixeles y en matriz
+                print(
+                        "X =", self.chef_ejex,
+                        "Y =", self.chef_ejey,
+                        "Fila =", fila,
+                        "Columna =", columna
+                        )
+
+
+
+##########################
+##########################
+
+        # Función que permite mover el chef hacia arriba
+        def mover_arriba(self):
+
+                # Se coloca la imagen del chef de espalda 
+                self.canvas.itemconfig(self.chef_canvas,image=self.imagen_arriba_tk)
+
+                # Resta a Y para subir (obtiene la posición actual del chef en el mapa)
+                self.chef_ejey = self.chef_ejey - self.distancia
+
+                # Se mueve la imagen del chef
+                self.canvas.move(self.chef_canvas, 0, -self.distancia) #chef, desplazamiento en ejex, desplazamiento en ejey
+
+##########################
+##########################
+                # Se muestra la posición actual del chef
+                self.mostrar_posicion()
+##########################
+##########################
+
+##########################
+        # Función que permite mover el chef hacia abajo
+        def mover_abajo(self):
+
+                # Se coloca la imagen del chef viendo hacia abajo 
+                self.canvas.itemconfig(self.chef_canvas,image=self.imagen_abajo_tk)
+                
+                # Suma a Y para bajar
+                        #Sirve para tener la ubicación original del chef en el mapa (para que no se salga del mapa)
+                self.chef_ejey = self.chef_ejey + self.distancia
+
+                # Mueve la imagen del chef
+                        #self.distancia tiene el valor por defecto de 15 pixeles eso movera la figura en el eje y ese valor
+                        #No depende de self.ejey, esto sirve para tener la ubicación original del chef en el mapa (para que no se salga del mapa)
+                self.canvas.move(self.chef_canvas, 0, self.distancia) #cchef, desplazamiento en ejex, desplazamiento en ejey
+
+##########################
+##########################
+                 # Se muestra la posición actual del chef
+                self.mostrar_posicion()
+##########################
+##########################
+                
+##########################
+        # Función que permite mover el chef hacia la izquierda
+        def mover_izquierda(self):
+
+                # Se coloca la imagen del chef viendo hacia la izquierda
+                self.canvas.itemconfig(self.chef_canvas,image=self.imagen_izquierda_tk)
+
+                # Resta a X para ir a la izquierda
+                        #Sirve para tener la ubicación original del chef en el mapa (para que no se salga del mapa)
+                self.chef_ejex = self.chef_ejex - self.distancia
+
+                # Mueve la imagen del chef
+                        #self.distancia tiene el valor por defecto de 15 pixeles eso movera la figura en el eje y ese valor
+                        #No depende de self.ejey, esto sirve para tener la ubicación original del chef en el mapa (para que no se salga del mapa)
+                self.canvas.move(self.chef_canvas, -self.distancia, 0)#cchef, desplazamiento en ejex, desplazamiento en ejey
+
+##########################
+##########################
+                 # Se muestra la posición actual del chef
+                self.mostrar_posicion()
+##########################
+#########################
+
+##########################
+        # Función que permite mover el chef hacia la derecha
+        def mover_derecha(self):
+
+                # Se coloca la imagen del chef viendo hacia la izquierda
+                self.canvas.itemconfig(self.chef_canvas,image=self.imagen_derecha_tk)
+
+                # Suma a X para ir a la derecha
+                #Sirve para tener la ubicación original del chef en el mapa (para que no se salga del mapa)
+                self.chef_ejex = self.chef_ejex + self.distancia
+
+                # Mueve la imagen del chef
+                        #self.distancia tiene el valor por defecto de 15 pixeles eso movera la figura en el eje y ese valor
+                        #No depende de self.ejey, esto sirve para tener la ubicación original del chef en el mapa (para que no se salga del mapa)
+                self.canvas.move(self.chef_canvas, self.distancia, 0) #chef, desplazamiento en ejex, desplazamiento en ejey
+
+##########################
+##########################
+                 # Se muestra la posición actual del chef
+                self.mostrar_posicion()
+##########################
+#########################
+
+
+
+
+#######################################################################################
+
 #Clase que guarda toda la información de los ingredienes de la cocina americana
 class ingredientes_restaurante_americano:
 
@@ -614,7 +830,7 @@ class ingredientes_restaurante_americano:
                 # Crea la imagen del ingrediente encima del chef
                 self.objeto_canvas = self.canvas_ingredientes.create_image(
                                                                                 chef.chef_ejex, #Posición actual del chef en el eje x 
-                                                                                chef.chef_ejey - 80,   # Coloca la imagen 40 píxeles arriba de la cabeza del chef
+                                                                                chef.chef_ejey - 120,   # Coloca la imagen 40 píxeles arriba de la cabeza del chef
                                                                                 image=self.imagen_tk # Se utiliza la imagen del ingrediente que fue cargada previamente
                                                                                 )
 ##########################
@@ -630,7 +846,7 @@ class ingredientes_restaurante_americano:
                         self.canvas_ingredientes.coords(
                                                 self.objeto_canvas,#Referencia del objeto o ingrediente que se esta usando 
                                                 chef.chef_ejex, #Se coloca el ingrediente del chef en el eje x 
-                                                chef.chef_ejey - 80 #Se coloca el ingrediente arriba de la cabeza del chef 
+                                                chef.chef_ejey - 120 #Se coloca el ingrediente arriba de la cabeza del chef 
                                                 )
 
 ##########################
@@ -765,8 +981,54 @@ class Pantalla_Restaurante_Americano:
                 #self.dibujar_cuadricula()
 
 #######
-                # Se crea el objeto chef dentro del restaurante americano
-                self.chef = Chef(self.canvas, self.BASE_DIR, "Jugador 1", 500, 350)
+               # Se crea el primer chef
+                self.chef1 = Chef(self.canvas, self.BASE_DIR, "Jugador 1", 350, 350)
+
+                # Se crea el segundo chef
+                self.chef2 = Chef2(self.canvas, self.BASE_DIR, "Jugador 2", 400, 350)
+
+                # Se coloca inicialmente como activo el chef 1
+                self.chef = self.chef1
+
+#######
+                # Ruta donde se encuentra la imagen del botón para cambiar de chef
+                ruta_boton_cambiar = os.path.join(
+                        self.BASE_DIR,                  # Se obtiene la ruta donde se guardan las imagenes 
+                        "Imagenes",                     # Carpeta donde están la imagen de cambiar el chef 
+                        "boton_cambiar_chef.png"        # Nombre de la imagen del botón que permite cambiar entre los chefs 
+                )
+
+                # Se abre la ruta donde se encuentra la imagen de cambiar chefs 
+                imagen_boton_cambiar = Image.open(ruta_boton_cambiar)
+
+                # Se define el tamaño que tendrá el botón de cambiar los chefs 
+                imagen_boton_cambiar = imagen_boton_cambiar.resize((140, 140))
+
+                # Se convierte la imagen a un formato que Tkinter pueda utilizar
+                self.imagen_boton_cambiar_tk = ImageTk.PhotoImage(imagen_boton_cambiar)
+
+                # Se crea la imagen del botón dentro del canvas
+                self.boton_cambiar_chef = self.canvas.create_image(
+
+                                                                        100,     # Posición del botón en el eje X
+
+                                                                        550,     # Posición del botón en el eje Y
+
+                                                                        image=self.imagen_boton_cambiar_tk  # Imagen que tendrá el botón
+                                                                )
+
+                # Permite detectar cuando el jugador hace clic sobre la imagen
+                self.canvas.tag_bind(
+
+                        self.boton_cambiar_chef,  # Imagen que funcionará como botón
+
+                        "<Button-1>",             # Detecta clic izquierdo del mouse
+
+                        self.cambiar_chef         # Llama a la función que cambia entre chef 1 y chef 2
+                )
+
+#######
+
 
                 # Se guarda el ingrediente que el chef está sosteniendo actualmente
                 self.ingrediente_en_mano = None
@@ -1098,6 +1360,26 @@ class Pantalla_Restaurante_Americano:
                 else:
 
                         print("No hay ingrediente para tomar")
+
+##########################################
+
+        #Función que permite cambiar entre los dos chefs 
+        def cambiar_chef(self, event):
+
+                #Si se tiene seleccionado el chef #1 se cambia por el chef #2
+                if self.chef == self.chef1:
+
+                        self.chef = self.chef2
+                        print("Chef 2 seleccionado")
+
+                else:
+                        #Si se tiene seleccionado el chef #2 se cambia por el chef #1
+                        self.chef = self.chef1
+                        print("Chef 1 seleccionado")
+                
+                # Devuelve el foco a la ventana para seguir usando las flechas
+
+                self.ventana_restaurante.focus_force()
                                 
 
 ##########################################
@@ -1192,7 +1474,7 @@ class Pantalla_Restaurante_Europeo:
                         [0,0,0,0,1,1,1,1,1,0,0,1,1,1,1,1,1,0,0,0],
 
                         # Fila 5
-                        [0,0,0,0,1,0,0,1,1,0,0,1,1,1,1,1,0,0,0,0],
+                        [0,0,0,0,1,1,0,1,1,0,0,1,1,1,1,1,0,0,0,0],
 
                         # Fila 6
                         [0,0,0,0,1,1,1,1,1,0,0,1,1,1,1,1,0,0,0,0],
@@ -1226,10 +1508,134 @@ class Pantalla_Restaurante_Europeo:
                 #Se dibuja la cuadrícula sobre la imagen de la cocina europea 
                 #self.dibujar_cuadricula()
 
-#######
-                # Se crea el objeto chef dentro del restaurante europeo
-                self.chef = Chef(self.canvas, self.BASE_DIR, "Jugador 1", 350, 350)
+                # Se crea el primer chef
+                self.chef1 = Chef(self.canvas, self.BASE_DIR, "Jugador 1", 350, 350)
 
+                # Se crea el segundo chef
+                self.chef2 = Chef2(self.canvas, self.BASE_DIR, "Jugador 2", 400, 350)
+
+                # Se coloca como chef activo el chef #1
+                self.chef = self.chef1
+
+#######         
+#               # Ruta de la imagen del botón para cambiar chef
+                ruta_boton_cambiar = os.path.join(
+                                                        self.BASE_DIR,
+                                                        "Imagenes",
+                                                        "boton_cambiar_chef.png"
+                                                )
+
+                # Se abre la imagen del botón
+                imagen_boton_cambiar = Image.open(ruta_boton_cambiar)
+
+                # Se ajusta el tamaño del botón
+                imagen_boton_cambiar = imagen_boton_cambiar.resize((140, 140))
+
+                # Se convierte la imagen para Tkinter
+                self.imagen_boton_cambiar_tk = ImageTk.PhotoImage(imagen_boton_cambiar)
+
+                # Se coloca la imagen en el canvas
+                self.boton_cambiar_chef = self.canvas.create_image(
+                                                                        100,
+                                                                        550,
+                                                                        image=self.imagen_boton_cambiar_tk
+                                                                )
+
+                # Se detecta el clic sobre la imagen
+                self.canvas.tag_bind(
+                                        self.boton_cambiar_chef, # Imagen que funcionará como botón
+                                        "<Button-1>", #Cambia el chef al presionar clic izquiero 
+                                        self.cambiar_chef # Se llama a la función que cambia el chef 
+                                )           
+
+
+#######
+                # Se guarda el ingrediente que el chef está sosteniendo actualmente
+                self.ingrediente_en_mano = None
+
+                # Se crea el ingrediente papa del restaurante europeo
+                self.papa = ingredientes_restaurante_americano(
+                                                                self.canvas,
+                                                                self.BASE_DIR,
+                                                                "Papa",
+                                                                "papa.png"
+                                                        )
+                
+                # Se crea el ingrediente pan del restaurante europeo
+                self.pan = ingredientes_restaurante_americano(
+                                                                        self.canvas,
+                                                                        self.BASE_DIR,
+                                                                        "Pan",
+                                                                        "pan.png"
+                                                                )
+                
+                # Se crea el ingrediente queso en cubos del restaurante europeo
+                self.queso_cubos = ingredientes_restaurante_americano(
+                                                                        self.canvas,
+                                                                        self.BASE_DIR,
+                                                                        "Queso_cubo",
+                                                                        "queso_cubos.png"
+                                                                )
+                
+                # Se crea el ingrediente lechuga del restaurante europeo
+                self.lechuga = ingredientes_restaurante_americano(
+                                                                        self.canvas,
+                                                                        self.BASE_DIR,
+                                                                        "lechuga",
+                                                                        "lechuga.png"
+                                                                )
+                
+                # Se crea el ingrediente tomate del restaurante europeo
+                self.tomate = ingredientes_restaurante_americano(
+                                                                        self.canvas,
+                                                                        self.BASE_DIR,
+                                                                        "Tomate",
+                                                                        "tomate.png"
+                                                                )
+                
+                # Se crea el ingrediente carne del restaurante europeo
+                self.carne = ingredientes_restaurante_americano(
+                                                                        self.canvas,
+                                                                        self.BASE_DIR,
+                                                                        "Carne",
+                                                                        "carne.png"
+                                                                )
+                
+                 # Se crea el ingrediente carne del restaurante europeo
+                self.camaron = ingredientes_restaurante_americano(
+                                                                        self.canvas,
+                                                                        self.BASE_DIR,
+                                                                        "Camaron",
+                                                                        "camaron.png"
+                                                                )
+                
+                 # Se crea el ingrediente jamon del restaurante europeo
+                self.jamon = ingredientes_restaurante_americano(
+                                                                        self.canvas,
+                                                                        self.BASE_DIR,
+                                                                        "Jamon",
+                                                                        "jamon.png"
+                                                                )
+                
+                # Se crea el ingrediente albahaca del restaurante europeo
+                self.albahaca = ingredientes_restaurante_americano(
+                                                                        self.canvas,
+                                                                        self.BASE_DIR,
+                                                                        "Albahaca",
+                                                                        "albahaca.png"
+                                                                )
+                # Se crea el ingrediente albahaca del restaurante europeo
+                self.pescado = ingredientes_restaurante_americano(
+                                                                        self.canvas,
+                                                                        self.BASE_DIR,
+                                                                        "Pescado",
+                                                                        "pescado.png"
+                                                                )
+
+                # Detecta cuando el jugador presiona la tecla A para tomar ingredientes
+                self.ventana_restaurante.bind("a", self.escoger_ingrediente_europeo)
+
+#######
                 # Permite que el chef se mueva en el restaurante con solo presionar las teclas (sin dar clic)
                 self.ventana_restaurante.focus_force()
 
@@ -1333,10 +1739,126 @@ class Pantalla_Restaurante_Europeo:
 
                                         # Se mueve el chef hacia la derecha
                                         self.chef.mover_derecha()
+
+####### 
+
+                                # Se verifica si el chef está cargando un ingrediente
+                                if self.ingrediente_en_mano != None:
+
+                                        # Se mueve el ingrediente junto con el chef
+                                        self.ingrediente_en_mano.mover_ingrediente_con_chef(self.chef)
+        
                                 
                         #Movimiento no válido
                         else: 
                                 print ("Movimiento no válido")
+
+##########################################
+        #Función que permite el cambio de chef en el restaurante 
+        def cambiar_chef(self, event):
+
+                if self.chef == self.chef1:
+
+                        #Se intercambia el chef #1 por el chef #2
+                        self.chef = self.chef2
+                        print("Chef 2 seleccionado")
+
+                else:
+                        #Si lo que esta seleccionado es el chef #2 se asigna el chef#1
+                        self.chef = self.chef1
+                        print("Chef 1 seleccionado")
+
+                self.ventana_restaurante.focus_force()
+
+##########################################
+        # Función que permite tomar ingredientes en el restaurante europeo
+        def escoger_ingrediente_europeo(self, event):
+
+                # Se obtiene la fila actual del chef
+                fila = self.chef.chef_ejey // 50
+
+                # Se obtiene la columna actual del chef
+                columna = self.chef.chef_ejex // 50
+
+                # Se guarda la posición actual del chef
+                posicion_chef = (fila, columna)
+
+                # Si el chef ya tiene un ingrediente, primero lo suelta
+                if self.ingrediente_en_mano != None:
+
+                        # Elimina el ingrediente actual
+                        self.ingrediente_en_mano.soltar_ingrediente()
+
+                        # Se deja la mano vacía
+                        self.ingrediente_en_mano = None
+
+
+                # Diccionario con las posiciones donde el chef puede tomar ingredientes
+                estantes_ingredientes = {
+
+                        # Papa
+                        (8, 3): self.papa,
+                        (8, 4): self.papa,
+
+                        # Pan
+                        (7, 3): self.pan,
+                        (7, 4): self.pan,
+
+                        # Queso_cubos
+                        (6, 3): self.queso_cubos,
+                        (6, 4): self.queso_cubos,
+
+                        # lechuga
+                        (5, 3): self.lechuga,
+                        (5, 4): self.lechuga,
+
+                        # tomate
+                        (4, 3): self.tomate,
+                        (4, 4): self.tomate,
+
+                        # carne
+                        (3, 3): self.carne,
+                        (3, 4): self.carne,
+
+                        # camaron
+                        (7, 15): self.camaron,
+                        (7, 16): self.camaron,
+
+                        # jamon
+                        (8, 15): self.jamon,
+                        (8, 16): self.jamon,
+
+                        # albahaca
+                        (10, 15): self.albahaca,
+                        (10, 16): self.albahaca,
+
+                        #Pescado 
+                        (11, 15): self.pescado,
+                        (11, 16): self.pescado,
+
+
+
+                }
+
+                # Se verifica si el chef está en una posición con ingrediente
+                if posicion_chef in estantes_ingredientes:
+
+                        # Obtiene el ingrediente según la posición del chef
+                        ingrediente = estantes_ingredientes[posicion_chef]
+
+                        # Coloca el ingrediente sobre el chef
+                        ingrediente.tomar_ingrediente(self.chef)
+
+                        # Guarda el ingrediente actual
+                        self.ingrediente_en_mano = ingrediente
+
+                        # Muestra cuál ingrediente tomó
+                        print(ingrediente.nombre_ingrediente, "tomado")
+
+                else:
+
+                        print("No hay ingrediente para tomar")
+                               
 
 ##########################################
 
