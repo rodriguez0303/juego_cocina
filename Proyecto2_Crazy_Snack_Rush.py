@@ -799,6 +799,9 @@ class ingredientes_restaurante_americano:
                 # Variable que guarda el nombre del ingrediente (zanahoria, tomate, queso, etc.)
                 self.nombre_ingrediente = nombre_ingrediente
 
+                # Estado inicial del ingrediente cuando se crea
+                self.estado_ingrediente = "crudo"
+
                 # Guarda el nombre del archivo de imagen
                 self.archivo_imagen = archivo_imagen
 
@@ -816,6 +819,7 @@ class ingredientes_restaurante_americano:
 
                 # Convierte la imagen en un formato que Tkinter pueda usar
                 self.imagen_tk = ImageTk.PhotoImage(imagen)
+
 
 ##########################
 
@@ -877,9 +881,52 @@ class ingredientes_restaurante_americano:
                 else: 
                         # Si no existe devuelve None
                         return None
+                
+##########################
+        # Función que cambia la imagen del ingrediente crudo a cocinado 
+        def imagen_ingrediente_cocinado(self, nuevo_archivo):
+
+                # Guarda el nuevo nombre de imagen
+                self.archivo_imagen = nuevo_archivo
+
+                # Ruta donde se encuentra la imagen del ingrediente cocinado 
+                ruta_imagen = os.path.join(
+                                                self.BASE_DIR,
+                                                "Imagenes",
+                                                self.archivo_imagen
+                                        )
+
+                # Se abre la ruta donde se encuentra el ingrediente cocinado 
+                imagen = Image.open(ruta_imagen)
+
+                # Se ajusta el tamaño de la imagen del ingrediene cocinado 
+                imagen = imagen.resize((40, 40))
+
+                # Convierte la imagen en un formato que pueda usar  Tkinter
+                self.imagen_tk = ImageTk.PhotoImage(imagen)
+
+                # Se valida si el chef ya tiene un ingrediente seleccionado 
+                if self.objeto_canvas != None:
+
+                        # Se caambia la imagen que se ve en pantalla
+                        self.canvas_ingredientes.itemconfig(
+                                                                self.objeto_canvas,
+                                                                image=self.imagen_tk
+                                                        )
 
 #######################################################################################
 
+#Clase que controlará los eventos de cocinar, cortar 
+class Cocina:
+
+        def __init__(self, fila, columna):
+
+                # Guarda la fila donde se encuentra la cocina
+                self.fila = fila
+
+                # Guarda la columna donde se encuentra la cocina
+                self.columna = columna
+#######################################################################################
 
 #Clase que contiene la funcionalidad del restaurante americano 
 class Pantalla_Restaurante_Americano:
@@ -925,6 +972,10 @@ class Pantalla_Restaurante_Americano:
                 # Detecta cuando el jugador presiona la tecla A que permite tomar los ingredientes
                 self.ventana_restaurante.bind("a", self.escoger_ingrediente_americano)
 
+                # Detecta cuando el jugador presiona la tecla "s" para cocinar
+                self.ventana_restaurante.bind("s", self.usar_cocina_americano)
+
+
 #######
                 # Matriz que permite el movimiento en el  restaurante americano 
 
@@ -962,7 +1013,7 @@ class Pantalla_Restaurante_Americano:
                         [0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0],
 
                         # Fila 10
-                        [0,0,0,0,1,1,1,1,1,1,1,1,0,0,0,1,1,0,0,0],
+                        [0,0,0,0,1,1,1,1,1,1,1,1,1,0,0,1,1,0,0,0],
 
                         # Fila 11
                         [0,1,1,1,1,1,1,1,1,1,1,1,0,0,0,1,1,0,0,0],
@@ -1028,10 +1079,31 @@ class Pantalla_Restaurante_Americano:
                 )
 
 #######
-
-
                 # Se guarda el ingrediente que el chef está sosteniendo actualmente
                 self.ingrediente_en_mano = None
+
+#######         
+
+                # Lista que almacena las posiciones de las cocinas del restaurante americano
+                        #Posicione válidas para cocinar la carne 
+                self.cocinas = [
+
+                                # Cocina superior derecha
+                                Cocina(2, 13),
+
+                                # Cocina superior derecha
+                                Cocina(2, 14),
+
+                                # Cocina superior derecha
+                                Cocina(3, 14),
+
+                                # Cocina inferior derecha
+                                Cocina(9, 13),
+
+                                # Cocina inferior derecha
+                                Cocina(9, 14)
+
+                        ]
 
 #######
 
@@ -1266,6 +1338,130 @@ class Pantalla_Restaurante_Americano:
 
 ##########################
 
+        # Función que verifica si el chef está ubicado en una cocina (le permitirá cocinar los ingredientes)
+        
+        def esta_en_cocina(self):
+
+                # Se obtiene la fila actual del chef activo
+                fila = self.chef.chef_ejey // 50
+
+                # Se obtiene la columna actual del chef activo
+                columna = self.chef.chef_ejex // 50
+
+                print("Fila:", fila, "Columna:", columna)
+
+                # Se recorre todas las cocinas almacenadas en la lista (almacenadas en la función "Pantalla_Restaurante_Americano")
+                for cocina in self.cocinas:
+
+                        # Verifica si la posición del chef coincide con una cocina
+                        if fila == cocina.fila and columna == cocina.columna:
+
+                                # Retorna True porque sí está en una cocina
+                                return True
+
+                # Si no coincide con la posición de ninguna cocina retorna False
+                return False
+        
+##########################
+        # Función que permite cocinar los ingredientes al presionar la tecla "s"
+        def usar_cocina_americano(self, event):
+
+                # Se valida si el chef está al frente de una cocina
+                if self.esta_en_cocina():
+
+                        # Cocina el ingrediente que tiene en la mano (carne)
+                        self.cocinar_ingrediente()
+
+                else:
+
+                        # Si no está en cocina, no cocina nada
+                        print("No está en una cocina")
+
+##########################
+
+        # Función que permite cocinar el ingrediente (proteina) que tiene el chef
+       
+        def cocinar_ingrediente(self):
+
+                # Verifica si el chef tiene un ingrediente seleccionado
+                if self.ingrediente_en_mano == None:
+
+                        print("No tienes ingrediente para cocinar")
+
+                else:
+
+                        # Se valida si el ingrediente que tiene el chef es una proteína para cocinarlo 
+                        if self.ingrediente_en_mano.nombre_ingrediente in [
+                                                                                "Carne",
+                                                                                "Camaron",
+                                                                                "Pescado",
+                                                                                "Jamon"
+                                                                        ]:
+
+                                # Si ya está cocinado no vuelve a cocinarse
+                                if self.ingrediente_en_mano.estado_ingrediente == "cocinado":
+
+                                        print("La proteína ya está cocinada")
+
+                                        return
+
+                                # Se cambia el estado del ingrediente
+                                self.ingrediente_en_mano.estado_ingrediente = "cocinado"
+
+                                # Se cambia la imagen de la carne cruda por la carne cocida
+                                if self.ingrediente_en_mano.nombre_ingrediente == "Carne":
+
+                                        self.ingrediente_en_mano.imagen_ingrediente_cocinado(
+                                                "carne_cocida.png"
+                                        )
+
+                                # Se cambia la imagen del camarón cruda por el camarón cocido
+                                elif self.ingrediente_en_mano.nombre_ingrediente == "Camaron":
+
+                                        self.ingrediente_en_mano.imagen_ingrediente_cocinado(
+                                                "camaron_cocido.png"
+                                        )
+
+                                # Se cambia la imagen del pescado crudo por el pescado cocido 
+                                elif self.ingrediente_en_mano.nombre_ingrediente == "Pescado":
+
+                                        self.ingrediente_en_mano.imagen_ingrediente_cocinado(
+                                                "pescado_cocido.png"
+                                        )
+
+                                # Se cambia la imagen del jamón crudo por el jamón cocido
+                                elif self.ingrediente_en_mano.nombre_ingrediente == "Jamon":
+
+                                        self.ingrediente_en_mano.imagen_ingrediente_cocinado(
+                                                "jamon_cocido.png"
+                                        )
+
+                                # Mensaje indicando que la proteína fue cocinada
+                                print(
+                                        self.ingrediente_en_mano.nombre_ingrediente,
+                                        "cocinado"
+                                )
+
+                                # Muestra el estado actual
+                                print(
+                                        "Estado:",
+                                        self.ingrediente_en_mano.estado_ingrediente
+                                )
+
+                        # Si no es una proteína se elimina de la mano del chef
+                        else:
+
+                                # Mensaje indicando que el ingrediente no puede cocinarse
+                                print("Este ingrediente no se puede cocinar")
+
+                                # El ingrediente desaparece de la mano del chef
+                                self.ingrediente_en_mano.soltar_ingrediente()
+
+                                # Se libera la mano del chef
+                                self.ingrediente_en_mano = None
+
+##########################
+
         # Función que determina qué ingrediente debe tomar el chef
         def escoger_ingrediente_americano(self, event):
 
@@ -1347,6 +1543,14 @@ class Pantalla_Restaurante_Americano:
 
                         # Obtiene el ingrediente según la posición del chef
                         ingrediente = estantes_ingredientes[posicion_chef]
+
+                        # Se agrega un estado "crudo" cada vez que el chef tome un ingrediente (evita que el estado de la carne quede "cocido" cuando usa la cocina)
+                        ingrediente.estado_ingrediente = "crudo"
+
+                        # Al regrear al estánte se cambia la imagen de la carne cocida por la carne cruda 
+                        if ingrediente.nombre_ingrediente == "Carne":
+
+                                ingrediente.imagen_ingrediente_cocinado("carne.png")
 
                         # Coloca el ingrediente sobre el chef
                         ingrediente.tomar_ingrediente(self.chef)
@@ -1486,10 +1690,10 @@ class Pantalla_Restaurante_Europeo:
                         [0,0,0,1,1,1,1,1,1,0,0,1,1,1,1,1,0,0,0,0],
 
                         # Fila 9
-                        [0,0,0,1,1,0,0,1,1,1,1,1,1,1,1,1,0,0,0,0],
+                        [0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0],
 
                         # Fila 10
-                        [0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0],
+                        [0,0,0,1,1,0,0,1,1,1,1,1,1,1,1,1,0,0,0,0],
 
                         # Fila 11
                         [0,0,0,1,1,1,1,1,1,0,0,1,1,1,0,1,1,0,0,0],
@@ -1553,6 +1757,34 @@ class Pantalla_Restaurante_Europeo:
                 # Se guarda el ingrediente que el chef está sosteniendo actualmente
                 self.ingrediente_en_mano = None
 
+#######
+                # Lista que almacena las posiciones donde el chef puede cocinar en el restaurante europeo
+                self.cocinas = [
+
+                                # Cocina izquierda superior
+                                Cocina(3, 7),
+                                Cocina(4, 7),
+
+                                # Cocina izquierda inferior
+                                Cocina(8, 4),
+                                Cocina(8, 5),
+                                Cocina(8, 6),
+                                Cocina(8, 7),
+
+                                Cocina(9, 4),
+                                Cocina(9, 5),
+                                Cocina(9, 6),
+                                Cocina(9, 7),
+
+                                Cocina(10, 3),
+                                Cocina(10, 4),
+                                Cocina(10, 7),
+                                Cocina(10, 8),
+
+                                # Cocina superior derecha
+                                Cocina(2, 13)
+]
+#######
                 # Se crea el ingrediente papa del restaurante europeo
                 self.papa = ingredientes_restaurante_americano(
                                                                 self.canvas,
@@ -1632,8 +1864,12 @@ class Pantalla_Restaurante_Europeo:
                                                                         "pescado.png"
                                                                 )
 
-                # Detecta cuando el jugador presiona la tecla A para tomar ingredientes
+                # Detecta cuando el jugador presiona la tecla "A" para tomar ingredientes
                 self.ventana_restaurante.bind("a", self.escoger_ingrediente_europeo)
+
+                # Detecta cuando el jugador presiona la tecla "S" para cocinar proteínas
+                self.ventana_restaurante.bind("s", self.usar_cocina_europeo)
+
 
 #######
                 # Permite que el chef se mueva en el restaurante con solo presionar las teclas (sin dar clic)
@@ -1641,7 +1877,10 @@ class Pantalla_Restaurante_Europeo:
 
                 # Se identifica cual es la tecla presionada por el usuario 
                 self.ventana_restaurante.bind("<Key>", self.mover_chef)
-                        
+ 
+
+##########################################
+#                       
         # Función que determina cual tecla se presionó el jugador para mover el chef
         def mover_chef(self, event):
 
@@ -1712,7 +1951,7 @@ class Pantalla_Restaurante_Europeo:
 ###########
                         print("Intentando ir a:",nueva_fila,nueva_columna,"Valor:",self.matriz_movimiento_europeo[nueva_fila][nueva_columna])
 ###########
-#######
+
                 # Se valida si la  nueva posición del chef está dentro de la matriz
                         if self.matriz_movimiento_europeo[nueva_fila][nueva_columna] == 1:
 
@@ -1753,7 +1992,104 @@ class Pantalla_Restaurante_Europeo:
                         else: 
                                 print ("Movimiento no válido")
 
+
 ##########################################
+
+        # Función que verifica si el chef está ubicado en una cocina
+        def esta_en_cocina(self):
+
+                # Se obtiene la fila actual del chef activo
+                fila = self.chef.chef_ejey // 50
+
+                # Se obtiene la columna actual del chef activo
+                columna = self.chef.chef_ejex // 50
+
+                print("Fila:", fila, "Columna:", columna)
+
+                # Se recorren todas las cocinas almacenadas en la lista
+                for cocina in self.cocinas:
+
+                        # Verifica si la posición del chef coincide con una cocina
+                        if fila == cocina.fila and columna == cocina.columna:
+
+                                return True
+
+                return False
+
+##########################################
+
+        # Función que permite cocinar al presionar S
+        def usar_cocina_europeo(self, event):
+
+                # Verifica si el chef está en una cocina
+                if self.esta_en_cocina():
+
+                        self.cocinar_ingrediente()
+
+                else:
+
+                        print("No está en una cocina")
+
+##########################################
+        
+        # Función que permite cocinar el ingrediente de la cocina europea que tiene el chef (solo proteinas)
+        def cocinar_ingrediente(self):
+
+                # Verifica si el chef tiene un ingrediente seleccionado
+                if self.ingrediente_en_mano == None:
+
+                        print("No tienes ingrediente para cocinar")
+
+                else:
+
+                        # Se verifica si el ingrediente es una proteína
+                        if self.ingrediente_en_mano.nombre_ingrediente in [
+                                                                                "Carne",
+                                                                                "Camaron",
+                                                                                "Pescado",
+                                                                                "Jamon"
+                                                                        ]:
+
+                                # Si ya está cocinado no vuelve a cocinarse el ingrediente
+                                if self.ingrediente_en_mano.estado_ingrediente == "cocinado":
+
+                                        print("La proteína ya está cocinada")
+                                        return
+
+                                # Se cambia el estado del ingrediente de "crudo" a "cocinado"
+                                self.ingrediente_en_mano.estado_ingrediente = "cocinado"
+
+                                # Se Cambia la imagen de la carne cruda a carne cocinada 
+                                if self.ingrediente_en_mano.nombre_ingrediente == "Carne":
+                                        self.ingrediente_en_mano.imagen_ingrediente_cocinado("carne_cocida.png")
+
+                                # Se Cambia la imagen del camarón crudo a camarón cocinado
+                                elif self.ingrediente_en_mano.nombre_ingrediente == "Camaron":
+                                        self.ingrediente_en_mano.imagen_ingrediente_cocinado("camaron_cocido.png")
+
+                                # Se Cambia la imagen del pescado crudo a pescado cocinado
+                                elif self.ingrediente_en_mano.nombre_ingrediente == "Pescado":
+                                        self.ingrediente_en_mano.imagen_ingrediente_cocinado("pescado_cocido.png")
+
+                                # Se Cambia la imagen del jamón crudo a jamón cocinado
+                                elif self.ingrediente_en_mano.nombre_ingrediente == "Jamon":
+                                        self.ingrediente_en_mano.imagen_ingrediente_cocinado("jamon_cocido.png")
+
+                                print(self.ingrediente_en_mano.nombre_ingrediente, "cocinado")
+                                print("Estado:", self.ingrediente_en_mano.estado_ingrediente)
+
+                        else:
+                                #Se le notifica al jugador que trato de cocinar un ingrediente que no es una proteina 
+                                print("Este ingrediente no se puede cocinar")
+
+                                #Cómo se cocino un ingrediente que no es proteina "se quemo" y por eso se le quita de las manos al chef
+                                self.ingrediente_en_mano.soltar_ingrediente()
+
+                                #Se actualiza el estado del ingrediente del chef a none tras cocinarlo no siendo una proteina 
+                                self.ingrediente_en_mano = None
+
+##########################################
+
         #Función que permite el cambio de chef en el restaurante 
         def cambiar_chef(self, event):
 
@@ -1845,6 +2181,29 @@ class Pantalla_Restaurante_Europeo:
 
                         # Obtiene el ingrediente según la posición del chef
                         ingrediente = estantes_ingredientes[posicion_chef]
+
+                        # Cada vez que se toma un ingrediente del estante vuelve a estar crudo
+                        ingrediente.estado_ingrediente = "crudo"
+
+                        #Al regresar al estante se actualiza la imagen de la carne cocida a carne cruda 
+                        if ingrediente.nombre_ingrediente == "Carne":
+
+                                ingrediente.imagen_ingrediente_cocinado("carne.png")
+
+                        #Al regresar al estante se actualiza la imagen del camarón cocida a camarón crudo
+                        elif ingrediente.nombre_ingrediente == "Camaron":
+
+                                ingrediente.imagen_ingrediente_cocinado("camaron.png")
+
+                        #Al regresar al estante se actualiza la imagen del pescado cocida al pescado crudo
+                        elif ingrediente.nombre_ingrediente == "Pescado":
+
+                                ingrediente.imagen_ingrediente_cocinado("pescado.png")
+
+                        #Al regresar al estante se actualiza la imagen del jamón cocido al jamón crudo
+                        elif ingrediente.nombre_ingrediente == "Jamon":
+
+                                ingrediente.imagen_ingrediente_cocinado("jamon.png")
 
                         # Coloca el ingrediente sobre el chef
                         ingrediente.tomar_ingrediente(self.chef)
