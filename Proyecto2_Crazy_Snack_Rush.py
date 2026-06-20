@@ -916,7 +916,7 @@ class ingredientes_restaurante_americano:
 
 #######################################################################################
 
-#Clase que controlará los eventos de cocinar, cortar 
+#Clase que guadar las posiciones de la cocina en los restaurates  
 class Cocina:
 
         def __init__(self, fila, columna):
@@ -925,6 +925,17 @@ class Cocina:
                 self.fila = fila
 
                 # Guarda la columna donde se encuentra la cocina
+                self.columna = columna
+#######################################################################################
+# Clase que guarda las posiciones de las tablas de picar en los restaurantes 
+class tabla_Picar:
+
+        def __init__(self, fila, columna):
+
+                # Se guarda la fila donde está la tabla de picar 
+                self.fila = fila
+
+                # Se guarda la columna donde está la tabla de picar
                 self.columna = columna
 #######################################################################################
 
@@ -975,6 +986,10 @@ class Pantalla_Restaurante_Americano:
                 # Detecta cuando el jugador presiona la tecla "s" para cocinar
                 self.ventana_restaurante.bind("s", self.usar_cocina_americano)
 
+                # Detecta cuando el jugador presiona la tecla "D" para picar ingredientes
+                self.ventana_restaurante.bind("d", self.usar_tabla_picar_americano)
+
+
 
 #######
                 # Matriz que permite el movimiento en el  restaurante americano 
@@ -1013,10 +1028,10 @@ class Pantalla_Restaurante_Americano:
                         [0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0],
 
                         # Fila 10
-                        [0,0,0,0,1,1,1,1,1,1,1,1,1,0,0,1,1,0,0,0],
+                        [0,0,0,0,1,1,1,1,1,1,1,1,1,0,0,1,1,1,0,0],
 
                         # Fila 11
-                        [0,1,1,1,1,1,1,1,1,1,1,1,0,0,0,1,1,0,0,0],
+                        [0,1,1,1,1,1,1,1,1,1,1,1,0,0,0,1,0,0,0,0],
 
                         # Fila 12
                         [0,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0],
@@ -1071,7 +1086,7 @@ class Pantalla_Restaurante_Americano:
                 # Permite detectar cuando el jugador hace clic sobre la imagen
                 self.canvas.tag_bind(
 
-                        self.boton_cambiar_chef,  # Imagen que funcionará como botón
+                        self.boton_cambiar_chef,  # Nombre de la imagen que funcionará como botón
 
                         "<Button-1>",             # Detecta clic izquierdo del mouse
 
@@ -1103,6 +1118,19 @@ class Pantalla_Restaurante_Americano:
                                 # Cocina inferior derecha
                                 Cocina(9, 14)
 
+                        ]
+                
+#######
+                # Lista que almacena las posiciones donde el chef puede cortar ingredientes
+                        # Posicione válidas para cortar ingredientes
+                self.tablas_picar = [
+
+                        # Tabla de picar en la parte superior de la pantalla 
+                        tabla_Picar(2, 5),
+
+                        #Tabla de picar en la parte inferior de la pantalla 
+                        tabla_Picar(10, 16),
+                        tabla_Picar(10, 17),
                         ]
 
 #######
@@ -1379,8 +1407,137 @@ class Pantalla_Restaurante_Americano:
 
 ##########################
 
+        # Función que verifica si el chef está en una tabla de picar
+        def esta_en_tabla_picar(self):
+
+                # Se obtiene la fila actual del chef
+                fila = self.chef.chef_ejey // 50
+
+                # Se obtiene la columna actual del chef
+                columna = self.chef.chef_ejex // 50
+
+                # Muestra la posición actual del chef
+                print("Fila:", fila, "Columna:", columna)
+
+                # Recorre todas las posiciones de las tablas de picar
+                for tabla in self.tablas_picar:
+
+                        # Se verifica si la posición del chef coincide con una tabla de picar
+                        if fila == tabla.fila and columna == tabla.columna:
+
+                                return True
+
+                # Si no coincide con ninguna tabla
+                return False
+
+##########################
+
+        # Función que se ejecuta cuando el jugador presiona D
+        def usar_tabla_picar_americano(self, event):
+
+                # Verifica si el chef está en una tabla de picar
+                if self.esta_en_tabla_picar():
+
+                        # Llama a la función que pica el ingrediente
+                        self.picar_ingrediente()
+
+                else:
+
+                        # Si no está en una tabla, no puede picar
+                        print("No está en una tabla de picar")
+
+########################## 
+
+        # Función que permite picar el ingrediente que tiene el chef
+        def picar_ingrediente(self):
+
+                # Verifica si el chef tiene un ingrediente en la mano
+                if self.ingrediente_en_mano == None:
+
+                        print("No tienes ingrediente para picar")
+
+                        return 
+
+                
+                # Si el ingrediente ya está picado, no se vuelve a picar
+                if self.ingrediente_en_mano.estado_ingrediente == "picado":
+
+                                print("El ingrediente ya está picado")
+
+                                return
+# #####                        
+                # Se verifica si el ingrediente puede picarse
+                if self.ingrediente_en_mano.nombre_ingrediente not in [
+
+                                                                                "Lechuga",
+                                                                                "Tomate",
+                                                                                "Cebolla",
+                                                                                "Zanahoria",
+                                                                                "Remolacha",
+                                                                                "Calabaza",
+                                                                                "Papa",
+                                                                                "Queso",
+                                                                                "Pan"
+
+                                                                                ]:
+
+                        print("Este ingrediente no se puede picar")
+
+                        return
+
+                # Se cambia el estado del ingrediente a picado
+                self.ingrediente_en_mano.estado_ingrediente = "picado"
+
+#######
+                # Se Cambia la imagen según el ingrediente picado
+
+                if self.ingrediente_en_mano.nombre_ingrediente == "Lechuga":
+
+                        self.ingrediente_en_mano.imagen_ingrediente_cocinado("lechuga_picada.png")
+
+                elif self.ingrediente_en_mano.nombre_ingrediente == "Papa":
+
+                        self.ingrediente_en_mano.imagen_ingrediente_cocinado("papa_picada.png")
+
+                elif self.ingrediente_en_mano.nombre_ingrediente == "Zanahoria":
+
+                        self.ingrediente_en_mano.imagen_ingrediente_cocinado("zanahoria_picada.png")
+
+                elif self.ingrediente_en_mano.nombre_ingrediente == "Tomate":
+
+                        self.ingrediente_en_mano.imagen_ingrediente_cocinado("tomate_picado.png")
+
+                elif self.ingrediente_en_mano.nombre_ingrediente == "Queso":
+
+                        self.ingrediente_en_mano.imagen_ingrediente_cocinado("queso_picado.png")
+
+                elif self.ingrediente_en_mano.nombre_ingrediente == "Cebolla":
+
+                        self.ingrediente_en_mano.imagen_ingrediente_cocinado("cebolla_picada.png")
+
+                elif self.ingrediente_en_mano.nombre_ingrediente == "Remolacha":
+
+                        self.ingrediente_en_mano.imagen_ingrediente_cocinado("remolacha_picada.png")
+
+                elif self.ingrediente_en_mano.nombre_ingrediente == "Calabaza":
+
+                        self.ingrediente_en_mano.imagen_ingrediente_cocinado("calabaza_picada.png")
+
+                elif self.ingrediente_en_mano.nombre_ingrediente == "Pan":
+
+                        self.ingrediente_en_mano.imagen_ingrediente_cocinado("pan_picado.png")
+
+
+
+                # Muestra mensaje de confirmación
+                print(self.ingrediente_en_mano.nombre_ingrediente, "picado")
+
+                # Muestra el nuevo estado
+                print("Estado:", self.ingrediente_en_mano.estado_ingrediente)                       
+
+##########################
+
         # Función que permite cocinar el ingrediente (proteina) que tiene el chef
-       
         def cocinar_ingrediente(self):
 
                 # Verifica si el chef tiene un ingrediente seleccionado
@@ -1552,6 +1709,12 @@ class Pantalla_Restaurante_Americano:
 
                                 ingrediente.imagen_ingrediente_cocinado("carne.png")
 
+                        # Si vuelve a tomar zanahoria, se restaura la imagen original
+                        if ingrediente.nombre_ingrediente == "Zanahoria":
+
+                                ingrediente.imagen_ingrediente_cocinado("zanahoria.png")
+
+
                         # Coloca el ingrediente sobre el chef
                         ingrediente.tomar_ingrediente(self.chef)
 
@@ -1706,9 +1869,6 @@ class Pantalla_Restaurante_Europeo:
 
                         ]
 
-                
-                
-
                 #Se dibuja la cuadrícula sobre la imagen de la cocina europea 
                 #self.dibujar_cuadricula()
 
@@ -1783,7 +1943,19 @@ class Pantalla_Restaurante_Europeo:
 
                                 # Cocina superior derecha
                                 Cocina(2, 13)
-]
+                                ]
+                
+#######
+                # Lista que almacena las posiciones donde el chef puede picar en el restaurante europeo
+                self.tablas_picar = [
+
+                        # Tabla de picar izquierda
+                        tabla_Picar(6, 5),
+                        tabla_Picar(6, 6),
+
+                        # Tabla de picar derecha
+                        tabla_Picar(9, 15)
+                ]
 #######
                 # Se crea el ingrediente papa del restaurante europeo
                 self.papa = ingredientes_restaurante_americano(
@@ -1869,6 +2041,9 @@ class Pantalla_Restaurante_Europeo:
 
                 # Detecta cuando el jugador presiona la tecla "S" para cocinar proteínas
                 self.ventana_restaurante.bind("s", self.usar_cocina_europeo)
+
+                # Detecta cuando el jugador presiona la tecla "D" para picar ingredientes
+                self.ventana_restaurante.bind("d", self.usar_tabla_picar_europeo)
 
 
 #######
@@ -2087,6 +2262,116 @@ class Pantalla_Restaurante_Europeo:
 
                                 #Se actualiza el estado del ingrediente del chef a none tras cocinarlo no siendo una proteina 
                                 self.ingrediente_en_mano = None
+
+##########################################
+        # Función que verifica si el chef está en una tabla de picar
+        def esta_en_tabla_picar(self):
+
+                # Se obtiene la fila actual del chef
+                fila = self.chef.chef_ejey // 50
+
+                # Se obtiene la columna actual del chef
+                columna = self.chef.chef_ejex // 50
+
+                # Muestra la posición actual del chef
+                print("Fila:", fila, "Columna:", columna)
+
+                # Recorre todas las posiciones de las tablas de picar
+                for tabla in self.tablas_picar:
+
+                        # Se verifica si la posición del chef coincide con una tabla de picar
+                        if fila == tabla.fila and columna == tabla.columna:
+
+                                return True
+
+                # Si no coincide con ninguna ubicación de tabla de picar 
+                return False
+
+##########################################
+
+        # Función que se ejecuta la funcionalidad de picar cuando el jugador presiona D
+        def usar_tabla_picar_europeo(self, event):
+
+                # Verifica si el chef está en una tabla de picar
+                if self.esta_en_tabla_picar():
+
+                        # Llama a la función que pica el ingrediente
+                        self.picar_ingrediente_europeo()
+
+                else:
+
+                        # Si no está en una tabla, no puede picar
+                        print("No está en una tabla de picar")
+
+##########################################
+
+        # Función que permite picar el ingrediente que tiene el chef en el restaurante europeo
+        def picar_ingrediente_europeo(self):
+
+                # Verifica si el chef tiene un ingrediente en la mano
+                if self.ingrediente_en_mano == None:
+
+                        print("No tienes ingrediente para picar")
+
+                        return
+
+                # Si el ingrediente ya está picado, no se vuelve a picar
+                if self.ingrediente_en_mano.estado_ingrediente == "picado":
+
+                        print("El ingrediente ya está picado")
+
+                        return
+
+                # Se verifica si el ingrediente puede picarse
+                if self.ingrediente_en_mano.nombre_ingrediente not in [
+
+                                                                                "Papa",
+                                                                                "Pan",
+                                                                                "Queso_cubo",
+                                                                                "lechuga",
+                                                                                "Tomate",
+                                                                                "Albahaca"
+
+                                                                        ]:
+
+                        print("Este ingrediente no se puede picar")
+
+                        return
+
+                # Se cambia el estado del ingrediente a picado
+                self.ingrediente_en_mano.estado_ingrediente = "picado"
+
+                # Se cambia la imagen según el ingrediente picado
+                if self.ingrediente_en_mano.nombre_ingrediente == "Papa":
+
+                        self.ingrediente_en_mano.imagen_ingrediente_cocinado("papa_picada.png")
+
+                elif self.ingrediente_en_mano.nombre_ingrediente == "Pan":
+
+                        self.ingrediente_en_mano.imagen_ingrediente_cocinado("pan_picado.png")
+
+                elif self.ingrediente_en_mano.nombre_ingrediente == "Queso_cubo":
+
+                        self.ingrediente_en_mano.imagen_ingrediente_cocinado("queso_picado.png")
+
+                elif self.ingrediente_en_mano.nombre_ingrediente == "lechuga":
+
+                        self.ingrediente_en_mano.imagen_ingrediente_cocinado("lechuga_picada.png")
+
+                elif self.ingrediente_en_mano.nombre_ingrediente == "Tomate":
+
+                        self.ingrediente_en_mano.imagen_ingrediente_cocinado("tomate_picado.png")
+
+                elif self.ingrediente_en_mano.nombre_ingrediente == "Albahaca":
+
+                        self.ingrediente_en_mano.imagen_ingrediente_cocinado("albahaca_picada.png")
+
+                # Muestra mensaje de confirmación
+                print(self.ingrediente_en_mano.nombre_ingrediente, "picado")
+
+                # Muestra el nuevo estado
+                print("Estado:", self.ingrediente_en_mano.estado_ingrediente)
+
 
 ##########################################
 
