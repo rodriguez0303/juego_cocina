@@ -192,6 +192,7 @@ class Pantalla_mapa:
                                                         "Imagenes",
                                                         "Asiatico.png"
                                                         )
+                
                 # Se abre la imagen del restaurante asiático
                 imagen_asiatico = Image.open(ruta_asiatico)
 
@@ -661,9 +662,6 @@ class Chef2:
                                                                 image=self.imagen_abajo_tk
                                                         )
 
-
-
-        ##########################
 ##########################
 
         # Función que muestra en consola la posición actual del chef (se utilizará para ver cuanto se puede mover el chef en el restaurante)
@@ -685,8 +683,6 @@ class Chef2:
                         "Fila =", fila,
                         "Columna =", columna
                         )
-
-
 
 ##########################
 ##########################
@@ -938,7 +934,18 @@ class tabla_Picar:
                 # Se guarda la columna donde está la tabla de picar
                 self.columna = columna
 #######################################################################################
+# Clase que almacena la posición de una freidora dentro del restaurante
+class Freidora:
 
+        def __init__(self, fila, columna):
+
+                # Guarda la fila donde se encuentra la freidora
+                self.fila = fila
+
+                # Guarda la columna donde se encuentra la freidora
+                self.columna = columna
+
+#######################################################################################
 #Clase que contiene la funcionalidad del restaurante americano 
 class Pantalla_Restaurante_Americano:
 
@@ -989,6 +996,9 @@ class Pantalla_Restaurante_Americano:
                 # Detecta cuando el jugador presiona la tecla "D" para picar ingredientes
                 self.ventana_restaurante.bind("d", self.usar_tabla_picar_americano)
 
+                # Detecta cuando el jugador presiona la tecla "F" para freír ingredientes
+                self.ventana_restaurante.bind("f", self.usar_freidora_americano)
+
 
 
 #######
@@ -1022,10 +1032,10 @@ class Pantalla_Restaurante_Americano:
                         [0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0],
 
                         # Fila 8
-                        [0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0],
+                        [0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0],
 
                         # Fila 9
-                        [0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0],
+                        [0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0],
 
                         # Fila 10
                         [0,0,0,0,1,1,1,1,1,1,1,1,1,0,0,1,1,1,0,0],
@@ -1059,10 +1069,10 @@ class Pantalla_Restaurante_Americano:
 #######
                 # Ruta donde se encuentra la imagen del botón para cambiar de chef
                 ruta_boton_cambiar = os.path.join(
-                        self.BASE_DIR,                  # Se obtiene la ruta donde se guardan las imagenes 
-                        "Imagenes",                     # Carpeta donde están la imagen de cambiar el chef 
-                        "boton_cambiar_chef.png"        # Nombre de la imagen del botón que permite cambiar entre los chefs 
-                )
+                                                        self.BASE_DIR,                  # Se obtiene la ruta donde se guardan las imagenes 
+                                                        "Imagenes",                     # Carpeta donde están la imagen de cambiar el chef 
+                                                        "boton_cambiar_chef.png"        # Nombre de la imagen del botón que permite cambiar entre los chefs 
+                                                )
 
                 # Se abre la ruta donde se encuentra la imagen de cambiar chefs 
                 imagen_boton_cambiar = Image.open(ruta_boton_cambiar)
@@ -1086,12 +1096,12 @@ class Pantalla_Restaurante_Americano:
                 # Permite detectar cuando el jugador hace clic sobre la imagen
                 self.canvas.tag_bind(
 
-                        self.boton_cambiar_chef,  # Nombre de la imagen que funcionará como botón
+                                        self.boton_cambiar_chef,  # Nombre de la imagen que funcionará como botón
 
-                        "<Button-1>",             # Detecta clic izquierdo del mouse
+                                        "<Button-1>",             # Detecta clic izquierdo del mouse
 
-                        self.cambiar_chef         # Llama a la función que cambia entre chef 1 y chef 2
-                )
+                                        self.cambiar_chef         # Llama a la función que cambia entre chef 1 y chef 2
+                                )
 
 #######
                 # Se guarda el ingrediente que el chef está sosteniendo actualmente
@@ -1125,14 +1135,24 @@ class Pantalla_Restaurante_Americano:
                         # Posicione válidas para cortar ingredientes
                 self.tablas_picar = [
 
-                        # Tabla de picar en la parte superior de la pantalla 
-                        tabla_Picar(2, 5),
+                                        # Tabla de picar en la parte superior de la pantalla 
+                                        tabla_Picar(2, 5),
 
-                        #Tabla de picar en la parte inferior de la pantalla 
-                        tabla_Picar(10, 16),
-                        tabla_Picar(10, 17),
-                        ]
+                                        #Tabla de picar en la parte inferior de la pantalla 
+                                        tabla_Picar(10, 16),
+                                        tabla_Picar(10, 17),
+                                        ]
 
+#######
+                # Lista que almacena las posiciones donde el chef puede usar la freidora
+                self.freidoras = [
+
+                                        # Posición frente a la freidora
+                                        Freidora(9, 3),
+
+                                        # Posición al costado de la freidora
+                                        Freidora(8, 3)
+                                ]
 #######
 
                 # Se crea el ingrediente carne del restaurante americano
@@ -1536,6 +1556,116 @@ class Pantalla_Restaurante_Americano:
                 print("Estado:", self.ingrediente_en_mano.estado_ingrediente)                       
 
 ##########################
+        # Función que verifica si el chef está ubicado en una freidora
+        def esta_en_freidora(self):
+
+                # Se obtiene la fila actual del chef
+                fila = self.chef.chef_ejey // 50
+
+                # Se obtiene la columna actual del chef
+                columna = self.chef.chef_ejex // 50
+
+                # Muestra la posición actual del chef
+                print("Fila:", fila, "Columna:", columna)
+
+                # Recorre todas las posiciones donde existe una freidora
+                for freidora in self.freidoras:
+
+                        # Verifica si la posición actual coincide con una freidora
+                        if fila == freidora.fila and columna == freidora.columna:
+
+                                return True
+
+                # Si no coincide con ninguna freidora
+                return False
+
+
+##########################
+
+        # Función que se ejecuta cuando el jugador presiona la tecla F
+        def usar_freidora_americano(self, event):
+
+                # Verifica si el chef está ubicado en una freidora
+                if self.esta_en_freidora():
+
+                        # Llama a la función que fríe el ingrediente
+                        self.freir_ingrediente()
+
+                else:
+
+                        # Se le informa al jugador que no está en una freidora
+                        print("No está en una freidora")
+
+##########################
+
+        # Función que permite freír ingredientes en el restaurante americano
+        def freir_ingrediente(self):
+
+                # Verifica si el chef tiene un ingrediente en la mano
+                if self.ingrediente_en_mano == None:
+
+                        # Se le notifica al jugador que no tiene ingredientes
+                        print("No tienes ingrediente para freír")
+
+                        return
+
+                # Verifica si el ingrediente ya fue freído anteriormente
+                if self.ingrediente_en_mano.estado_ingrediente == "frito":
+
+                        # Se le informa al jugador que el ingrediente ya está listo
+                        print("El ingrediente ya está frito")
+
+                        return
+
+                # Se verifica si el ingrediente puede freírse
+                if self.ingrediente_en_mano.nombre_ingrediente not in [
+
+                                                                        "Papa",
+                                                                        "Pescado",
+                                                                        "Camaron", 
+                                                                        "Carne"
+
+                                                                ]:
+
+                        # Se le informa al jugador que ese ingrediente no puede freírse
+                        print("Este ingrediente no se puede freír")
+
+                        # El ingrediente desaparece si este no puede freirse
+                        self.ingrediente_en_mano.soltar_ingrediente()
+
+                        # Se libera la mano del chef (tras eliminar el ingrediente que no puede freirse las manos del chef quedan libre)
+                        self.ingrediente_en_mano = None
+
+                        return
+
+                # Se cambia el estado del ingrediente a frito
+                self.ingrediente_en_mano.estado_ingrediente = "frito"
+
+                # Se cambia la imagen según el ingrediente que se está friendo
+                if self.ingrediente_en_mano.nombre_ingrediente == "Papa":
+
+                        # Se cambia la imagen de la papa cruda a papa frita
+                        self.ingrediente_en_mano.imagen_ingrediente_cocinado("papa_frita.png")
+
+                # Se cambia la imagen del pescado crudo a pescado frito
+                elif self.ingrediente_en_mano.nombre_ingrediente == "Pescado":
+                        self.ingrediente_en_mano.imagen_ingrediente_cocinado("pescado_frito.png")
+
+                # Se cambia la imagen de la carne cruda a carne frita
+                elif self.ingrediente_en_mano.nombre_ingrediente == "Carne":
+                        self.ingrediente_en_mano.imagen_ingrediente_cocinado("carne_frita.png")
+
+                # Se cambia la imagen del camaron crudo a camaron frito
+                elif self.ingrediente_en_mano.nombre_ingrediente == "Camaron":
+                        self.ingrediente_en_mano.imagen_ingrediente_cocinado("camaron_frito.png")
+
+                # Muestra un mensaje indicando qué ingrediente fue freído
+                print(self.ingrediente_en_mano.nombre_ingrediente, "frito")
+
+                # Muestra el nuevo estado del ingrediente
+                print("Estado:", self.ingrediente_en_mano.estado_ingrediente)
+
+##########################
 
         # Función que permite cocinar el ingrediente (proteina) que tiene el chef
         def cocinar_ingrediente(self):
@@ -1568,42 +1698,29 @@ class Pantalla_Restaurante_Americano:
                                 # Se cambia la imagen de la carne cruda por la carne cocida
                                 if self.ingrediente_en_mano.nombre_ingrediente == "Carne":
 
-                                        self.ingrediente_en_mano.imagen_ingrediente_cocinado(
-                                                "carne_cocida.png"
-                                        )
+                                        self.ingrediente_en_mano.imagen_ingrediente_cocinado("carne_cocida.png")
 
                                 # Se cambia la imagen del camarón cruda por el camarón cocido
                                 elif self.ingrediente_en_mano.nombre_ingrediente == "Camaron":
 
-                                        self.ingrediente_en_mano.imagen_ingrediente_cocinado(
-                                                "camaron_cocido.png"
-                                        )
+                                        self.ingrediente_en_mano.imagen_ingrediente_cocinado("camaron_cocido.png")
 
                                 # Se cambia la imagen del pescado crudo por el pescado cocido 
                                 elif self.ingrediente_en_mano.nombre_ingrediente == "Pescado":
 
-                                        self.ingrediente_en_mano.imagen_ingrediente_cocinado(
-                                                "pescado_cocido.png"
-                                        )
+                                        self.ingrediente_en_mano.imagen_ingrediente_cocinado("pescado_cocido.png")
 
                                 # Se cambia la imagen del jamón crudo por el jamón cocido
                                 elif self.ingrediente_en_mano.nombre_ingrediente == "Jamon":
 
-                                        self.ingrediente_en_mano.imagen_ingrediente_cocinado(
-                                                "jamon_cocido.png"
-                                        )
+                                        self.ingrediente_en_mano.imagen_ingrediente_cocinado("jamon_cocido.png")
 
                                 # Mensaje indicando que la proteína fue cocinada
                                 print(
-                                        self.ingrediente_en_mano.nombre_ingrediente,
-                                        "cocinado"
-                                )
+                                        self.ingrediente_en_mano.nombre_ingrediente,"cocinado")
 
                                 # Muestra el estado actual
-                                print(
-                                        "Estado:",
-                                        self.ingrediente_en_mano.estado_ingrediente
-                                )
+                                print("Estado:",self.ingrediente_en_mano.estado_ingrediente)
 
                         # Si no es una proteína se elimina de la mano del chef
                         else:
@@ -1693,7 +1810,7 @@ class Pantalla_Restaurante_Americano:
 
 
                 }
-
+#######
              
                 # Se verifica si la posición actual del chef está en algún estante
                 if posicion_chef in estantes_ingredientes:
@@ -1709,11 +1826,66 @@ class Pantalla_Restaurante_Americano:
 
                                 ingrediente.imagen_ingrediente_cocinado("carne.png")
 
-                        # Si vuelve a tomar zanahoria, se restaura la imagen original
-                        if ingrediente.nombre_ingrediente == "Zanahoria":
+                        # Si se vuelve a tomar la remolacha, se restaura la imagen original
+                        elif ingrediente.nombre_ingrediente == "Remolacha":
+
+                                ingrediente.imagen_ingrediente_cocinado("remolacha.png")
+                        
+                        elif ingrediente.nombre_ingrediente == "Calabaza":
+
+                                ingrediente.imagen_ingrediente_cocinado("calabaza.png")
+
+                        # Si se vuelve a tomar la zanahoria, se restaura la imagen original
+                        elif ingrediente.nombre_ingrediente == "Zanahoria":
 
                                 ingrediente.imagen_ingrediente_cocinado("zanahoria.png")
 
+                        # Si vuelve a tomar la papa, se restaura la imagen original (luego de freirla o cocinarla)
+                        elif ingrediente.nombre_ingrediente == "Papa":
+
+                                ingrediente.imagen_ingrediente_cocinado("papa.png")
+
+                        # Si se vuelve a tomar el tomate, se restaura la imagen original
+                        elif ingrediente.nombre_ingrediente == "Tomate":
+
+                                ingrediente.imagen_ingrediente_cocinado("tomate.png")
+
+                        # Si se vuelve a tomar la mayonesa, se restaura la imagen original
+                        elif ingrediente.nombre_ingrediente == "Mayonesa":
+
+                                ingrediente.imagen_ingrediente_cocinado("mayonesa.png")
+                        
+                        # Si se vuelve a tomar el queso, se restaura la imagen original
+                        elif ingrediente.nombre_ingrediente == "Queso":
+
+                                ingrediente.imagen_ingrediente_cocinado("queso.png")
+
+                        # Si se vuelve a tomar la lenteja, se restaura la imagen original
+                        elif ingrediente.nombre_ingrediente == "Lentejas":
+
+                                ingrediente.imagen_ingrediente_cocinado("lentejas.png")
+
+                        # Si se vuelve a tomar la cebolla, se restaura la imagen original
+                        elif ingrediente.nombre_ingrediente == "Cebolla":
+
+                                ingrediente.imagen_ingrediente_cocinado("cebolla.png")        
+
+                        # Si se vuelve a tomar la aceituna, se restaura la imagen original
+                        elif ingrediente.nombre_ingrediente == "Aceituna":
+
+                                ingrediente.imagen_ingrediente_cocinado("aceituna.png")
+
+                        # Si vuelve a tomar el pescado, se restaura la imagen original (luego de freirla o cocinarla)
+                        elif ingrediente.nombre_ingrediente == "Pescado":
+
+                                ingrediente.imagen_ingrediente_cocinado("pescado.png")
+
+                        # Si vuelve a tomar camarón, se restaura la imagen original (luego de freirla o cocinarla)
+                        elif ingrediente.nombre_ingrediente == "Camaron":
+
+                                ingrediente.imagen_ingrediente_cocinado("camaron.png")
+
+#######
 
                         # Coloca el ingrediente sobre el chef
                         ingrediente.tomar_ingrediente(self.chef)
@@ -1949,13 +2121,28 @@ class Pantalla_Restaurante_Europeo:
                 # Lista que almacena las posiciones donde el chef puede picar en el restaurante europeo
                 self.tablas_picar = [
 
-                        # Tabla de picar izquierda
-                        tabla_Picar(6, 5),
-                        tabla_Picar(6, 6),
+                                        # Tabla de picar izquierda
+                                        tabla_Picar(6, 5),
+                                        tabla_Picar(6, 6),
 
-                        # Tabla de picar derecha
-                        tabla_Picar(9, 15)
-                ]
+                                        # Tabla de picar derecha
+                                        tabla_Picar(9, 15)
+                                ]
+                
+#######
+                # Lista que almacena las posiciones donde el chef puede usar la freidora
+                self.freidoras = [
+
+                                         # Posición frente a la freidora
+                                        Freidora(5, 15),
+
+                                        # Posición izquierda frente a la freidora
+                                        Freidora(6, 14),
+
+                                        # Posición derecha frente a la freidora
+                                        Freidora(6, 15)
+
+                                ]                 
 #######
                 # Se crea el ingrediente papa del restaurante europeo
                 self.papa = ingredientes_restaurante_americano(
@@ -2045,6 +2232,9 @@ class Pantalla_Restaurante_Europeo:
                 # Detecta cuando el jugador presiona la tecla "D" para picar ingredientes
                 self.ventana_restaurante.bind("d", self.usar_tabla_picar_europeo)
 
+                # Detecta cuando el jugador presiona la tecla "F" para freír ingredientes
+                self.ventana_restaurante.bind("f", self.usar_freidora_europeo)
+
 
 #######
                 # Permite que el chef se mueva en el restaurante con solo presionar las teclas (sin dar clic)
@@ -2052,7 +2242,6 @@ class Pantalla_Restaurante_Europeo:
 
                 # Se identifica cual es la tecla presionada por el usuario 
                 self.ventana_restaurante.bind("<Key>", self.mover_chef)
- 
 
 ##########################################
 #                       
@@ -2372,6 +2561,105 @@ class Pantalla_Restaurante_Europeo:
                 # Muestra el nuevo estado
                 print("Estado:", self.ingrediente_en_mano.estado_ingrediente)
 
+##########################################
+        # Función que se ejecuta cuando el jugador presiona la tecla F
+        def usar_freidora_europeo(self, event):
+
+                # Verifica si el chef está frente a una freidora 
+                if self.esta_en_freidora(): 
+                        # se fríe el ingrediente que tiene el chef
+                        self.freir_ingrediente_europeo()
+                
+                else:
+                        print("El chef No está frente a una freidora")
+##########################################
+
+        # Función que verifica si el chef está frente a una freidora
+
+        def esta_en_freidora(self):
+
+                # Se obtiene la fila actual del chef
+                fila = self.chef.chef_ejey // 50
+
+                # Se obtiene la columna actual del chef
+                columna = self.chef.chef_ejex // 50
+
+                # Se recorre todas las posiciones válidas de freidora
+                for freidora in self.freidoras:
+
+                        # Si coincide la posición del chef con una freidora
+                        if fila == freidora.fila and columna == freidora.columna:
+
+                                return True
+
+                # Si no está frente a ninguna freidora
+                return False 
+
+##########################################
+        # Función que permite freír ingredientes en el restaurante europeo
+        def freir_ingrediente_europeo(self):
+
+                # Se verifica si el chef tiene un ingrediente en la mano
+                if self.ingrediente_en_mano == None:
+
+                        print("El chef no tiene ingrediente para freír")
+
+                        return
+
+                # Verifica si el ingrediente ya fue freído anteriormente
+                if self.ingrediente_en_mano.estado_ingrediente == "frito":
+
+                        print("El ingrediente ya está frito")
+
+                        return
+
+                # Se verifica si el ingrediente es uno de los que pueden freírse
+                if self.ingrediente_en_mano.nombre_ingrediente not in [
+
+                                                                        "Papa",
+                                                                        "Pescado",
+                                                                        "Camaron",
+                                                                        "Jamon",
+                                                                        "Carne"
+
+                                                                        ]:
+
+                        print("Ingrediente quemado")
+
+                        self.ingrediente_en_mano.soltar_ingrediente()
+
+                        self.ingrediente_en_mano = None
+
+                        return
+
+                # Se cambia el estado del ingrediente a frito
+                self.ingrediente_en_mano.estado_ingrediente = "frito"
+
+                # Se cambia la imagen de la papa cruda a papa frita
+                if self.ingrediente_en_mano.nombre_ingrediente == "Papa":
+                        self.ingrediente_en_mano.imagen_ingrediente_cocinado("papa_frita.png")
+
+                # Se cambia la imagen de la carne cruda a carne frita
+                elif self.ingrediente_en_mano.nombre_ingrediente == "Carne":
+                        self.ingrediente_en_mano.imagen_ingrediente_cocinado("carne_frita.png")
+
+
+                # Se cambia la imagen del pescado crudo a pescado frito
+                elif self.ingrediente_en_mano.nombre_ingrediente == "Pescado":
+                        self.ingrediente_en_mano.imagen_ingrediente_cocinado("pescado_frito.png")
+
+                # Se cambia la imagen del camarón crudo a camarón frito
+                elif self.ingrediente_en_mano.nombre_ingrediente == "Camaron":
+                        self.ingrediente_en_mano.imagen_ingrediente_cocinado("camaron_frito.png")
+
+                # Se cambia la imagen del jamón crudo a jamón frito
+                elif self.ingrediente_en_mano.nombre_ingrediente == "Jamon":
+                        self.ingrediente_en_mano.imagen_ingrediente_cocinado("jamon_frito.png")
+
+                print(self.ingrediente_en_mano.nombre_ingrediente, "frito")
+
+                print("Estado:", self.ingrediente_en_mano.estado_ingrediente)
+
 
 ##########################################
 
@@ -2474,6 +2762,36 @@ class Pantalla_Restaurante_Europeo:
                         if ingrediente.nombre_ingrediente == "Carne":
 
                                 ingrediente.imagen_ingrediente_cocinado("carne.png")
+
+                        # Al regresar al estante se actualiza la imagen de la papa picada a papa cruda
+                        elif ingrediente.nombre_ingrediente == "Papa":
+
+                                ingrediente.imagen_ingrediente_cocinado("papa.png")
+
+                        # Al regresar al estante se actualiza la imagen del pan picado a pan normal
+                        elif ingrediente.nombre_ingrediente == "Pan":
+
+                                ingrediente.imagen_ingrediente_cocinado("pan.png")
+
+                        # Al regresar al estante se actualiza la imagen del queso picado a queso normal
+                        elif ingrediente.nombre_ingrediente == "Queso_cubo":
+
+                                ingrediente.imagen_ingrediente_cocinado("queso_cubos.png")
+
+                        # Al regresar al estante se actualiza la imagen de la lechuga picada a lechuga normal
+                        elif ingrediente.nombre_ingrediente == "lechuga":
+
+                                ingrediente.imagen_ingrediente_cocinado("lechuga.png")
+
+                        # Al regresar al estante se actualiza la imagen del tomate picado a tomate normal
+                        elif ingrediente.nombre_ingrediente == "Tomate":
+
+                                ingrediente.imagen_ingrediente_cocinado("tomate.png")
+                        
+                        # Al regresar al estante se actualiza la imagen de la albahaca picada a albahaca normal
+                        elif ingrediente.nombre_ingrediente == "Albahaca":
+
+                                ingrediente.imagen_ingrediente_cocinado("albahaca.png")
 
                         #Al regresar al estante se actualiza la imagen del camarón cocida a camarón crudo
                         elif ingrediente.nombre_ingrediente == "Camaron":
