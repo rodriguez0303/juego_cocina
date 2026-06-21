@@ -88,18 +88,188 @@ class Pantalla_Principal:
         # Función que destruye la pantalla principal para luego mostrar la pantalla de juegos 
         def iniciar_juego(self, event):
 
-         # Se oculta la pantalla principal
+                # Se oculta la pantalla principal
                 self.ventana.withdraw()
 
-        # Se abre la ventana de mapas del juego 
-                self.pantalla_mapa = Pantalla_mapa(self.ventana)
+                # Se abre la pantalla donde el jugador escribe su nombre
+                self.pantalla_nombre = Pantalla_Nombre_Jugador(self.ventana)
 
+#######################################################################################
+
+# Clase que permite ingresar el nombre del jugador antes de iniciar el juego
+class Pantalla_Nombre_Jugador:
+
+        def __init__(self, ventana_principal):
+
+                # Guarda la ventana principal para poder abrir el mapa después
+                self.ventana_principal = ventana_principal
+
+                # Se crea una ventana secundaria para escribir el nombre
+                self.ventana_nombre = Toplevel(ventana_principal)
+
+                # Se coloca el título de la ventana nombre del jugador
+                self.ventana_nombre.title("Nombre del jugador")
+
+                # Define el tamaño y la posición de la ventana
+                self.ventana_nombre.geometry("900x690+350+70")
+
+                # Se evita que el usuario cambie el tamaño de la ventana
+                self.ventana_nombre.resizable(False, False)
+
+        #######
+
+                # Se crea un canvas para colocar una imagen de fondo a la pantalla de nombre de usuario
+                self.canvas = Canvas(
+                                        self.ventana_nombre,
+                                        width=900,
+                                        height=690
+                                )
+
+                # Se coloca el canvas en la ventana
+                self.canvas.pack(fill=BOTH, expand=True)
+
+                # Se obtiene la carpeta donde está el archivo .py
+                self.BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+                # Se define la ruta de la imagen de fondo para la pantalla del nombre del jugador
+                ruta_fondo = os.path.join(
+                                                self.BASE_DIR,
+                                                "Imagenes", # Carpeta donde se guarda la imagen
+                                                "Nombre_jugador.png" # Nombre de la imagen que se colocará de fondo
+                                        )
+
+                # Se abre la imagen
+                imagen_fondo = Image.open(ruta_fondo)
+
+                # Se ajusta la imagen al tamaño de la ventana
+                imagen_fondo = imagen_fondo.resize((900, 690))
+
+                # Se convierte la imagen a un formato que pueda usar tkinter
+                self.imagen_fondo_tk = ImageTk.PhotoImage(imagen_fondo)
+
+                # Se coloca la imagen en el canvas
+                self.canvas.create_image(
+                                                0,
+                                                0,
+                                                image=self.imagen_fondo_tk,
+                                                anchor=NW
+                                        )
+
+        #######
+
+                # Crea un texto que le indica al jugador qué debe hacer
+                self.label_nombre = Label(
+                                                self.ventana_nombre,
+                                                text="¿Cuál es tu nombre, chef?",
+                                                font=("Arial", 18, "bold"),
+                                                fg="white", # Color de la letra
+                                                bg="#5B3A29" # Fondo café oscuro
+                                                
+                                        )
+
+                # Se coloca el label sobre la imagen de fondo
+                self.canvas.create_window(
+                                                450,
+                                                220,
+                                                window=self.label_nombre
+                                        )
+
+        #######
+
+                # Crea el textbox donde el jugador escribirá su nombre
+                self.entrada_nombre = Entry(
+                                                self.ventana_nombre,
+                                                font=("Arial", 16),
+                                                width=25
+                                        )
+
+                # Se coloca la caja de texto sobre la imagen de fondo
+                self.canvas.create_window(
+                                                450,
+                                                280,
+                                                window=self.entrada_nombre
+                                        )
+
+        #######
+
+                # Se crea un label de advertencia inicialmente vacío, para que el usuario no pueda iniciar el juego sino digita su nombre
+                self.label_advertencia = Label(
+                                                        self.ventana_nombre,
+                                                        text="",
+                                                        font=("Arial", 12, "bold"),
+                                                        fg="white", # Color de la letra
+                                                        bg="#5B3A29" # Fondo café oscuro
+                                                )
+
+                # Se coloca el label de advertencia sobre la imagen de fondo
+                self.canvas.create_window(
+                                                450,
+                                                340,
+                                                window=self.label_advertencia
+                                        )
+
+        #######
+
+                # Crea el botón para continuar al mapa de los restaurantes
+                self.boton_continuar = Button(
+                                                self.ventana_nombre,
+                                                text="Continuar",
+                                                font=("Arial", 14, "bold"),
+                                                command=self.continuar_juego
+                                        )
+
+                # Se coloca el botón sobre la imagen de fondo
+                self.canvas.create_window(
+                                                450,
+                                                400,
+                                                window=self.boton_continuar
+                                        )
+
+########################################
+        # Función que valida que se ingrese un nombre de jugador para abrir el mapa de los restaurantes 
+
+        def continuar_juego(self):
+
+                # Se obtiene el texto escrito por el jugador
+                nombre_jugador = self.entrada_nombre.get()
+
+                # Se elimina espacios en blanco al inicio y al final del nombre
+                nombre_jugador = nombre_jugador.strip()
+
+                # Se Verifica si el jugador dejó el campo vacío
+                if nombre_jugador == "":
+
+                        # Muestra un mensaje de advertencia
+                        self.label_advertencia.config(
+                                text="Debes escribir un nombre para continuar"
+                        )
+
+                        # Se detiene la función para que no avance al mapa
+                        return
+
+                # Limpia el mensaje de advertencia si el nombre sí fue escrito
+                self.label_advertencia.config(text="")
+
+                # Se cierra la ventana donde se escribió el nombre
+                self.ventana_nombre.destroy()
+
+                # Abre el mapa y le envía el nombre del jugador
+                self.pantalla_mapa = Pantalla_mapa(
+                        self.ventana_principal,
+                        nombre_jugador
+                )
 #######################################################################################
 
 # Clase que crea la ventana principal del juego
 class Pantalla_mapa:
 
-        def __init__(self, ventana_principal):
+        def __init__(self, ventana_principal, nombre_jugador):
+
+                 # Se guarda la ventana principal
+                self.ventana_principal = ventana_principal
+
+                # Se guarda el nombre del jugador
+                self.nombre_jugador = nombre_jugador
 
                 #Se Obtiene la carpeta donde está el archivo .py (evita problema con la carga de imagenes)
                 self.BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -151,8 +321,7 @@ class Pantalla_mapa:
                                                 image=self.imagen_fondo_mapa_tk,
                                                 anchor=NW
                                                 )
-        ################        
-        #######
+################        
                 #Ruta de la imagen restaurante pizza que esta sobre el mapa principal 
                 ruta_restaurante_americano = os.path.join(
                                                         self.BASE_DIR,
@@ -169,7 +338,7 @@ class Pantalla_mapa:
                 # Se convierte la imagen a un formato que tkinter pueda usar
                 self.imagen_americano_tk = ImageTk.PhotoImage(imagen_americano)
 
-        #######
+#######
                 #Ruta de la imagen restaurante europeo que esta sobre el mapa principal 
                 ruta_restaurante_europeo = os.path.join(
                                                                 self.BASE_DIR,
@@ -293,7 +462,7 @@ class Pantalla_mapa:
                 self.ventana_juego.withdraw()
 
                 # Se abre la ventana del restaurante americano
-                self.pantalla_americano = Pantalla_Restaurante_Americano(self.ventana_juego)
+                self.pantalla_americano = Pantalla_Restaurante_Americano(self.ventana_juego,self.nombre_jugador)
 
 #######                                
         # Funcion que abre el mapa de juego del restaurante Europeo
@@ -303,7 +472,7 @@ class Pantalla_mapa:
                 self.ventana_juego.withdraw()
 
                 # Se abre la ventana del restaurante americano
-                self.pantalla_europeo = Pantalla_Restaurante_Europeo(self.ventana_juego)
+                self.pantalla_europeo = Pantalla_Restaurante_Europeo(self.ventana_juego,self.nombre_jugador)
 
 
 #######
@@ -314,7 +483,7 @@ class Pantalla_mapa:
                 self.ventana_juego.withdraw()
 
                 # Se abre la ventana del restaurante asiático
-                self.pantalla_asiatico = Pantalla_Restaurante_Asiatico(self.ventana_juego)
+                self.pantalla_asiatico = Pantalla_Restaurante_Asiatico(self.ventana_juego,self.nombre_jugador)
 
 #######################################################################################
 
@@ -949,7 +1118,13 @@ class Freidora:
 #Clase que contiene la funcionalidad del restaurante americano 
 class Pantalla_Restaurante_Americano:
 
-        def __init__(self, ventana_mapa):
+        def __init__(self, ventana_mapa, nombre_jugador):
+
+                # Se guarda el nombre del jugador actual
+                self.nombre_jugador = nombre_jugador
+
+                # Se inicializa el puntaje del jugador en cero
+                self.puntaje_jugador = 0
 
                 # Se obtiene la carpeta donde está la imagen de la cocicna americana 
                 self.BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -987,6 +1162,34 @@ class Pantalla_Restaurante_Americano:
                 # Se coloca la imagen de fondo en el canvas
                 self.canvas.create_image(0, 0, image=self.imagen_cocina_tk, anchor=NW)
 
+                # Se crea un texto en el canvas para mostrar el nombre del jugador
+                self.texto_nombre_jugador = self.canvas.create_text(
+
+                                                                        350, # Posición del nombre del jugador en el eje X
+
+                                                                        30, # Posición del nombre del jugador en el eje Y
+
+                                                                        text="Jugador: " + self.nombre_jugador, # Texto que se mostrará en pantalla
+
+                                                                        fill="white", # Color de las letras
+
+                                                                        font=("Arial", 14, "bold") # Tipo de letra, tamaño y estilo
+                                                                )
+
+                # Se crea un texto en el canvas para mostrar el puntaje actual del jugador
+                self.texto_puntaje_jugador = self.canvas.create_text(
+
+                                                                        600, # Posición del puntaje del jugador en el eje X
+
+                                                                        30, # Posición del puntaje del jugador en el eje Y
+
+                                                                        text="Puntaje: " + str(self.puntaje_jugador), # Texto que se mostrará en pantalla
+
+                                                                        fill="white", # Color de las letras
+
+                                                                        font=("Arial", 14, "bold") # Tipo de letra, tamaño y estilo
+                                                                )
+
                 # Detecta cuando el jugador presiona la tecla A que permite tomar los ingredientes
                 self.ventana_restaurante.bind("a", self.escoger_ingrediente_americano)
 
@@ -999,7 +1202,27 @@ class Pantalla_Restaurante_Americano:
                 # Detecta cuando el jugador presiona la tecla "F" para freír ingredientes
                 self.ventana_restaurante.bind("f", self.usar_freidora_americano)
 
+#######
+                # Etiquetas que contiene el nombre de los ingredientes del estante izquierdo
+                self.canvas.create_text(110, 135, text="Carne", fill="white", font=("Arial", 8, "bold"))
+                self.canvas.create_text(115, 170, text="Remolacha", fill="white", font=("Arial", 8, "bold"))
+                self.canvas.create_text(100, 205, text="Hongo", fill="white", font=("Arial", 8, "bold"))
+                self.canvas.create_text(100, 255, text="Calabaza", fill="white", font=("Arial", 8, "bold"))
+                self.canvas.create_text(100, 295, text="Zanahoria", fill="white", font=("Arial", 8, "bold"))
+                self.canvas.create_text(80, 345, text="Papa", fill="white", font=("Arial", 8, "bold"))
 
+                # Etiquetas del estante derecho
+                self.canvas.create_text(880, 175, text="Tomate", fill="white", font=("Arial", 8, "bold"))
+
+                self.canvas.create_text(880, 210, text="Mayonesa", fill="white", font=("Arial", 8, "bold"))
+
+                self.canvas.create_text(880, 250, text="Queso", fill="white", font=("Arial", 8, "bold"))
+
+                self.canvas.create_text(900, 290, text="Lentejas", fill="white", font=("Arial", 8, "bold"))
+
+                self.canvas.create_text(900, 320, text="Cebolla Morada", fill="white", font=("Arial", 8, "bold"))
+
+                self.canvas.create_text(900, 360, text="Aceitunas", fill="white", font=("Arial", 8, "bold"))
 
 #######
                 # Matriz que permite el movimiento en el  restaurante americano 
@@ -1181,7 +1404,7 @@ class Pantalla_Restaurante_Americano:
                 self.hongo = ingredientes_restaurante_americano(
                                                                         self.canvas,          # Canvas donde se dibujará la imagen de la calabaza
                                                                         self.BASE_DIR,        # Ruta donde se encuentra la carpeta de las imagenes
-                                                                        "Calabaza",           # Nombre del ingrediente que se va a usar 
+                                                                        "Hongo",           # Nombre del ingrediente que se va a usar 
                                                                         "hongo.png"        # Imagen de la calabaza
                                                                         )
                 
@@ -1497,7 +1720,8 @@ class Pantalla_Restaurante_Americano:
                                                                                 "Calabaza",
                                                                                 "Papa",
                                                                                 "Queso",
-                                                                                "Pan"
+                                                                                "Pan",
+                                                                                "Hongo"
 
                                                                                 ]:
 
@@ -1518,6 +1742,10 @@ class Pantalla_Restaurante_Americano:
                 elif self.ingrediente_en_mano.nombre_ingrediente == "Papa":
 
                         self.ingrediente_en_mano.imagen_ingrediente_cocinado("papa_picada.png")
+
+                elif self.ingrediente_en_mano.nombre_ingrediente == "Hongo":
+
+                        self.ingrediente_en_mano.imagen_ingrediente_cocinado("hongo_picado.png")
 
                 elif self.ingrediente_en_mano.nombre_ingrediente == "Zanahoria":
 
@@ -1835,6 +2063,11 @@ class Pantalla_Restaurante_Americano:
 
                                 ingrediente.imagen_ingrediente_cocinado("calabaza.png")
 
+                          # Si se vuelve a tomar el hongo, se restaura la imagen original
+                        elif ingrediente.nombre_ingrediente == "Hongo":
+
+                                ingrediente.imagen_ingrediente_cocinado("hongo.png")
+
                         # Si se vuelve a tomar la zanahoria, se restaura la imagen original
                         elif ingrediente.nombre_ingrediente == "Zanahoria":
 
@@ -1956,7 +2189,13 @@ class Pantalla_Restaurante_Americano:
 #Clase que contiene la funcionalidad del restaurante Europe 
 class Pantalla_Restaurante_Europeo:
 
-        def __init__(self, ventana_mapa):
+        def __init__(self, ventana_mapa, nombre_jugador):
+
+                # Se guarda el nombre del jugador actual
+                self.nombre_jugador = nombre_jugador
+
+                # Se inicializa el puntaje del jugador en cero
+                self.puntaje_jugador = 0
 
                 # Se obtiene la carpeta donde está la imagen de la cocicna Europea 
                 self.BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -1993,6 +2232,34 @@ class Pantalla_Restaurante_Europeo:
 
                 # Se coloca la imagen de fondo en el canvas
                 self.canvas.create_image(0, 0, image=self.imagen_cocina_tk, anchor=NW)
+
+                                # Se crea un texto en el canvas para mostrar el nombre del jugador
+                self.texto_nombre_jugador = self.canvas.create_text(
+
+                                                                        350, # Posición del nombre del jugador en el eje X
+
+                                                                        30, # Posición del nombre del jugador en el eje Y
+
+                                                                        text="Jugador: " + self.nombre_jugador, # Texto que se mostrará en pantalla
+
+                                                                        fill="white", # Color de las letras
+
+                                                                        font=("Arial", 14, "bold") # Tipo de letra, tamaño y estilo
+                                                                )
+
+                # Se crea un texto en el canvas para mostrar el puntaje actual del jugador
+                self.texto_puntaje_jugador = self.canvas.create_text(
+
+                                                                        600, # Posición del puntaje del jugador en el eje X
+
+                                                                        30, # Posición del puntaje del jugador en el eje Y
+
+                                                                        text="Puntaje: " + str(self.puntaje_jugador), # Texto que se mostrará en pantalla
+
+                                                                        fill="white", # Color de las letras
+
+                                                                        font=("Arial", 14, "bold") # Tipo de letra, tamaño y estilo
+                                                                )
 
                 # Creación de matriz para el restaurante europeo
                 self.matriz_movimiento_europeo = [
@@ -2052,6 +2319,33 @@ class Pantalla_Restaurante_Europeo:
 
                 # Se coloca como chef activo el chef #1
                 self.chef = self.chef1
+####### 
+                # Etiquetas estante izquierdo
+
+                self.canvas.create_text(170, 140, text="Carne", fill="white", font=("Arial", 8, "bold"))
+
+                self.canvas.create_text(160, 190, text="Tomate", fill="white", font=("Arial", 8, "bold"))
+
+                self.canvas.create_text(150, 240, text="Lechuga", fill="white", font=("Arial", 8, "bold"))
+
+                self.canvas.create_text(140, 290, text="Queso cubos", fill="white", font=("Arial", 8, "bold"))
+
+                self.canvas.create_text(130, 345, text="Pan", fill="white", font=("Arial", 8, "bold"))
+
+                self.canvas.create_text(120, 395, text="Papa", fill="white", font=("Arial", 8, "bold"))
+
+#######   
+                # Etiquetas estante derecho
+
+                self.canvas.create_text(810, 345, text="Camarones", fill="white", font=("Arial", 8, "bold"))
+
+                self.canvas.create_text(810, 395, text="Jamón", fill="white", font=("Arial", 8, "bold"))
+
+                self.canvas.create_text(833, 490, text="Albahaca", fill="white", font=("Arial", 8, "bold"))
+
+                self.canvas.create_text(833, 540, text="Pescado", fill="white", font=("Arial", 8, "bold"))
+
+
 
 #######         
 #               # Ruta de la imagen del botón para cambiar chef
