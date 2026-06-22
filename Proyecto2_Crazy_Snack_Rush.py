@@ -51,7 +51,7 @@ class Pantalla_Principal:
                                                 anchor=NW
                                                 )
                 
-        #######
+#######
                 # Se define la ruta de la imagen del botón jugar 
                 ruta_boton_jugar = os.path.join(self.BASE_DIR,'Imagenes','Boton_Jugar.png')
 
@@ -69,11 +69,11 @@ class Pantalla_Principal:
 
                                                                 
                                                                 500,# Posición del botón en el eje X
-                                                                550,# Posición del botón en el eje Y
+                                                                480,# Posición del botón en el eje Y
                                                                 image=self.imagen_boton_jugar_tk # Imagen que tendrá el botón
                                                         )
   
-        #######
+#######
                 # Evento que permite hacer click sobre la imagen del botón jugar 
                 self.canvas.tag_bind(
                                         self.boton_jugar,# Imagen que funcionará como botón
@@ -81,6 +81,67 @@ class Pantalla_Principal:
                                         self.iniciar_juego # Se llama a la función que inicializa el juego 
 
 
+                                )
+                
+#######
+                # Se define la ruta de la imagen del botón Scores
+                ruta_boton_scores = os.path.join(
+                                                        self.BASE_DIR,
+                                                        "Imagenes",
+                                                        "Boton_Scores.png"
+                                                )
+
+                # Se abre la carpeta donde se encuentra la imagen del botón Scores
+                imagen_boton_scores = Image.open(ruta_boton_scores)
+
+                # Se define el tamaño del  botón Scores
+                imagen_boton_scores = imagen_boton_scores.resize((250, 100))
+
+                # Se convierte la imagen en un formato que Tkinter pueda usar 
+                self.imagen_boton_scores_tk = ImageTk.PhotoImage(imagen_boton_scores)
+
+                # Se coloca el botón Scores en pantalla principal 
+                self.boton_scores = self.canvas.create_image(
+                                                                500,
+                                                                540,
+                                                                image=self.imagen_boton_scores_tk
+                                                        )
+
+                # Se abre la pantalla de Scores al dar clic izquierdo sobre este 
+                self.canvas.tag_bind(
+                                        self.boton_scores,
+                                        "<Button-1>",
+                                        self.mostrar_scores
+                                )
+#######
+                # Se define la ruta de la imagen del botón About
+                ruta_boton_about = os.path.join(
+                                                        self.BASE_DIR,
+                                                        "Imagenes", #Nombre de la carpeta que contiene la imagen de fondo del botón about
+                                                        "Boton_About.png" #Nombre de la imagen del botón about 
+                                                )
+
+                # Se abre la ruta de la imagen del botón About
+                imagen_boton_about = Image.open(ruta_boton_about)
+
+                # Se define el tamaño del botón About
+                imagen_boton_about = imagen_boton_about.resize((250, 100))
+
+                # Se convierte la imagen en un formato que Tkinter pueda usar
+                self.imagen_boton_about_tk = ImageTk.PhotoImage(imagen_boton_about)
+
+                # Se coloca el botón About en pantalla principal
+                self.boton_about = self.canvas.create_image(
+                                                                500,
+                                                                610,
+                                                                image=self.imagen_boton_about_tk
+                                                        )
+
+                # Se abre la pantalla About al dar clic izquierdo sobre este
+                self.canvas.tag_bind(
+                                        self.boton_about,
+                                        "<Button-1>",
+                                        self.about
                                 )
                 
 #######################################################################################
@@ -97,6 +158,220 @@ class Pantalla_Principal:
                 # Se abre la pantalla donde el jugador escribe su nombre
                 self.pantalla_nombre = Pantalla_Nombre_Jugador(self.ventana)
 
+#######################################################################################
+
+        # Función que muestra los puntajes guardados en la pantalla principal 
+        def mostrar_scores(self, event):
+
+                # Ruta de la imagen de fondo
+                ruta_fondo_scores = os.path.join(
+                                                self.BASE_DIR, #Ruta donde se encuentra la imagen 
+                                                "Imagenes", #Carpeta donde esta la imagen de fondo 
+                                                "fondo_scores.png" #Nombre de la imagen que se colocará de fondo 
+                                        )
+
+                # Se abre la ruta donde se encuentra la imagen de fondo scores
+                imagen_fondo_scores = Image.open(ruta_fondo_scores)
+
+                # Se ajusta el tamaño de la imagen de fondo scores
+                imagen_fondo_scores = imagen_fondo_scores.resize((800, 600))
+
+                # Se convierte la imagen en un formato que Tkinter pueda usar 
+                self.imagen_fondo_scores_tk = ImageTk.PhotoImage(imagen_fondo_scores)
+
+                # Se crea una ventana secundaria para mostrar los puntajes
+                ventana_scores = Toplevel(self.ventana)
+
+                # Se coloca el título de la ventana scores
+                ventana_scores.title("Scores")
+
+                # Se define el tamaño de la ventana
+                ventana_scores.geometry("800x600+450+100")
+
+                # Se evita cambiar el tamaño
+                ventana_scores.resizable(False, False)
+
+                # Se crea el texto inicial
+                texto_scores = "SCORES\n\n"
+
+                # Se verifica si existe el archivo de puntajes
+                if os.path.exists("puntajes.txt"):
+
+                        # Se abre el archivo en modo lectura
+                        archivo = open("puntajes.txt", "r")
+
+                        # Se leen todas las líneas
+                        lineas = archivo.readlines()
+
+                        # Se cierra el archivo
+                        archivo.close()
+
+                        # Lista donde se guardarán los jugadores y puntajes
+                        lista_puntajes = []
+
+                        # Se recorre cada línea del archivo
+                        for linea in lineas:
+
+                                # Se elimina el salto de línea
+                                linea = linea.strip()
+
+                                # Se verifica que la línea no esté vacía
+                                if linea != "":
+
+                                        # Se separa nombre y puntaje
+                                        datos = linea.split(",")
+
+                                        # Se verifica que existan dos datos (para comparar quien tiene el mayor puntaje y va de primero)
+                                        if len(datos) == 2:
+
+                                                # Guarda nombre y puntaje
+                                                nombre = datos[0]
+
+                                                puntaje = int(datos[1])
+
+                                                # Se agrega a la lista
+                                                lista_puntajes.append([nombre, puntaje])
+
+                        # Ordenamiento  de mayor a menor
+                        for i in range(len(lista_puntajes) - 1):
+
+                                for j in range(len(lista_puntajes) - 1 - i):
+
+                                        if lista_puntajes[j][1] < lista_puntajes[j + 1][1]:
+
+                                                auxiliar = lista_puntajes[j]
+
+                                                lista_puntajes[j] = lista_puntajes[j + 1]
+
+                                                lista_puntajes[j + 1] = auxiliar
+
+                        # Se agregan los puntajes ya ordenados al texto
+                        for jugador in lista_puntajes:
+
+                                texto_scores += (
+                                        jugador[0]
+                                        + " - "
+                                        + str(jugador[1])
+                                        + " puntos\n"
+                                )
+
+                else:
+
+                        # Si no hay archivo, se muestra este mensaje
+                        texto_scores += "No hay puntajes guardados"
+
+                # Canvas de la ventana
+                canvas_scores = Canvas(
+                                                        ventana_scores,
+                                                        width=800,
+                                                        height=600
+                                                )
+                # Se coloca el canvas en la ventana 
+                canvas_scores.pack()
+
+                # Imagen de fondo que tendrá el canvas 
+                canvas_scores.create_image(
+                                                        0,
+                                                        0,
+                                                        image=self.imagen_fondo_scores_tk,
+                                                        anchor=NW
+                                                )
+                # Texto que contiene los puntajes de los jugadores 
+                canvas_scores.create_text(
+                                                        20, #Posición del puntaje en el eje x 
+                                                        50, #Posición del puntaje en el eje y 
+                                                        text=texto_scores,
+                                                        fill="white",
+                                                        font=("Arial", 18, "bold"),
+                                                        anchor=NW
+                                                )
+#######################################################################################
+        # Función que muestra la información del proyecto
+        def about(self, event):
+
+                # Se crea una ventana secundaria
+                ventana_about = Toplevel(self.ventana)
+
+                # Se coloca el título
+                ventana_about.title("About")
+
+                # Se define el tamaño de la ventana 
+                ventana_about.geometry("800x600+450+100")
+
+                # Se evita cambiar el tamaño de la ventana about 
+                ventana_about.resizable(False, False)
+
+#######
+        # Ruta de la imagen de fondo de la ventana about 
+                ruta_fondo_about = os.path.join(
+                        self.BASE_DIR, # Se abre la ruta donde se encuentra la imagen de fonro 
+                        "Imagenes", #Carpeta donde se encuentra la imagen de fondo 
+                        "fondo_about.png" #Nombre de la imagen del fondo de la pantalla about 
+                )
+
+                # Se abre la ruta donde se encuentra la imagen de fondo 
+                imagen_fondo_about = Image.open(ruta_fondo_about)
+
+                # Se ajusta el tamaño
+                imagen_fondo_about = imagen_fondo_about.resize((800, 600))
+
+                # Se convierte la imagen en un formato que pueda usar Tkinter
+                self.imagen_fondo_about_tk = ImageTk.PhotoImage(imagen_fondo_about)
+
+                # Se crea el canvas
+                canvas_about = Canvas(
+                                        ventana_about,
+                                        width=800,
+                                        height=600
+                                )
+
+                # Se coloca el canvas
+                canvas_about.pack()
+
+                # Se coloca la imagen de fondo
+                canvas_about.create_image(
+                                                0,
+                                                0,
+                                                image=self.imagen_fondo_about_tk,
+                                                anchor=NW
+                                        )
+#######
+
+        # Texto que aparecerá en la pantalla about 
+                texto_about = """
+        Tecnológico de Costa Rica
+
+        Introducción a la Programación
+
+        Proyecto Programado 2
+
+        Crazy Snack Rush
+
+        Estudiantes:
+
+        Luis Rodríguez M
+        Samantha Carmona R 
+
+        Profesor:
+        Santiago Ramirez 
+
+        I Semestre 2026
+
+        Visual Studio Code - version 1.125.1
+
+        Version 1.0
+
+        """
+
+                # Se muestra el texto
+                canvas_about.create_text(
+                                                400, #Posición del texto en el eje x 
+                                                324, #Posición del texto en el eje y
+                                                text=texto_about,
+                                                fill="black", #Color del texto 
+                                                font=("Arial", 10, "bold"), # Tipo, tamaño y forma de la letra
+                                                justify="center" # Alineación del texto 
+                                        )
 #######################################################################################
 
 # Clase que permite ingresar el nombre del jugador antes de iniciar el juego
@@ -273,6 +548,13 @@ class Pantalla_mapa:
 
                 # Se guarda el nombre del jugador
                 self.nombre_jugador = nombre_jugador
+
+                # Puntaje acumulado del jugador durante todos los restaurantes
+                self.puntaje_jugador = 0
+
+                # Se controla si el restaurante americano ya fue aprobado para poder iniciar el restaurante Europeo
+                        # Se hace para que se acumulen los puntos del restaurante americano y luego el restaurante europeo
+                self.americano_aprobado = False
 
                 #Se Obtiene la carpeta donde está el archivo .py (evita problema con la carga de imagenes)
                 self.BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -465,17 +747,27 @@ class Pantalla_mapa:
                 self.ventana_juego.withdraw()
 
                 # Se abre la ventana del restaurante americano
-                self.pantalla_americano = Pantalla_Restaurante_Americano(self.ventana_juego,self.nombre_jugador)
+                self.pantalla_americano = Pantalla_Restaurante_Americano(self.ventana_juego,self.nombre_jugador,self)
 
 #######                                
         # Funcion que abre el mapa de juego del restaurante Europeo
         def abrir_europeo(self, event):
 
+                # Se verifica si el restaurante americano ya fue aprobado
+                if self.americano_aprobado == False:
+
+                        messagebox.showinfo(
+                                "Restaurante bloqueado",
+                                "Primero debes completar las 3 recetas del Restaurante Americano"
+                        )
+
+                        return
+
                 # Se oculta la ventana del mapa
                 self.ventana_juego.withdraw()
 
-                # Se abre la ventana del restaurante americano
-                self.pantalla_europeo = Pantalla_Restaurante_Europeo(self.ventana_juego,self.nombre_jugador)
+                # Se abre la ventana del restaurante europeo
+                self.pantalla_europeo = Pantalla_Restaurante_Europeo(self.ventana_juego,self.nombre_jugador,self.puntaje_jugador)
 
 
 #######
@@ -1226,9 +1518,13 @@ class Receta:
 #Clase que contiene la funcionalidad del restaurante americano 
 class Pantalla_Restaurante_Americano:
 
-        def __init__(self, ventana_mapa, nombre_jugador):
+        def __init__(self, ventana_mapa, nombre_jugador, pantalla_mapa):
 
                 self.ventana_mapa = ventana_mapa
+
+                # Guarda una referencia del mapa se utilizará como referencia del puntaje 
+                        #Puntaje obtenido en el restaurante americano al restaurante europe
+                self.pantalla_mapa = pantalla_mapa
 
                 # Se guarda el nombre del jugador actual
                 self.nombre_jugador = nombre_jugador
@@ -1844,6 +2140,12 @@ class Pantalla_Restaurante_Americano:
                                 "¡FELICIDADES!\nCompletaste las 3 recetas correctamente"
                         )
 
+                        # Se guarda el puntaje acumulado en el mapa
+                        self.pantalla_mapa.puntaje_jugador = self.puntaje_jugador
+
+                        # Se marca el restaurante americano como aprobado
+                        self.pantalla_mapa.americano_aprobado = True
+
                         # Se cierra la cocina americana
                         self.ventana_restaurante.destroy()
 
@@ -2042,6 +2344,12 @@ class Pantalla_Restaurante_Americano:
 
                         # Se actualiza la orden en pantalla
                         self.mostrar_orden_americano()
+
+                        # Se devuelve el foco a la ventana del restaurante
+                        self.ventana_restaurante.focus_force()
+
+                        # Se vuelve a asegurar que las teclas sigan funcionando
+                        self.ventana_restaurante.bind("<Key>", self.mover_chef)
 
                         # Se vuelve a iniciar el temporizador
                         self.actualizar_temporizador()
@@ -2734,15 +3042,18 @@ class Pantalla_Restaurante_Americano:
 #Clase que contiene la funcionalidad del restaurante Europe 
 class Pantalla_Restaurante_Europeo:
 
-        def __init__(self, ventana_mapa, nombre_jugador):
+        def __init__(self, ventana_mapa, nombre_jugador, puntaje_inicial):
 
                 self.ventana_mapa = ventana_mapa
 
                 # Se guarda el nombre del jugador actual
                 self.nombre_jugador = nombre_jugador
 
+                 # Se recibe el puntaje acumulado del restaurante americano
+                self.puntaje_jugador = puntaje_inicial
+
                 # Se inicializa el puntaje del jugador en cero
-                self.puntaje_jugador = 0
+                #self.puntaje_jugador = 0
 
                 # Se obtiene la carpeta donde está la imagen de la cocicna Europea 
                 self.BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -3605,9 +3916,20 @@ class Pantalla_Restaurante_Europeo:
                                 # El mensaje de receta incorrecta desaparece después de 3 segundos
                                 self.ventana_restaurante.after(3000,self.ocultar_mensaje_error)
 
+                                # Reinicia el temporizador
+                                self.tiempo_restante = 60
 
+                                # Actualiza el reloj en pantalla
+                                self.canvas.itemconfig(
+                                                        self.texto_temporizador,
+                                                        text="01:00"
+                                                )
+                                                
                                 # Se limpian los ingredientes entregados para intentar otra vez
                                 self.ingredientes_entregados = []
+
+                                # Se devuelve el foco a la ventana del restaurante
+                                self.ventana_restaurante.focus_force()
                 
                 # Si todavía no se han entregado todos los ingredientes, no se valida la receta
                 else:
@@ -3615,6 +3937,24 @@ class Pantalla_Restaurante_Europeo:
                         # Se muestra que todavía faltan ingredientes
                         print("Todavía faltan ingredientes para validar la receta")
 
+##########################################
+        # Función que guarda el nombre y puntaje del jugador
+        def guardar_resultado(self):
+
+                # Se crea automáticamente el archivo TXT que almacenará el nombre y puntaje 
+                        # la letra "a" es un append para almacenar los diferentes jugadores y sus puntajes 
+                archivo = open("puntajes.txt", "a")
+
+                # Se guarda nombre,puntaje
+                archivo.write(
+                                self.nombre_jugador +
+                                "," +
+                                str(self.puntaje_jugador) +
+                                "\n"
+                        )
+
+                # Se cierra el archivo
+                archivo.close()
 ##########################################
         # Función que genera la siguiente receta europea
         def generar_nueva_orden_europeo(self):
@@ -3636,12 +3976,15 @@ class Pantalla_Restaurante_Europeo:
 
                         print("Todas las órdenes americanas fueron completadas")
 
+                        # Se llama a la función anterior "guardar_resulado" que guarda el nombre y puntaje de cada jugador 
+                        self.guardar_resultado()
+
                         # Muestra un mensaje emergente
                         messagebox.showinfo(
                                 "Restaurante Europeo",
                                 "¡FELICIDADES!\nCompletaste las 3 recetas correctamente")
 
-                        # Cierra la cocina americana
+                        # Cierra la cocina europea
                         self.ventana_restaurante.destroy()
 
                         # Vuelve a mostrar el mapa
@@ -4071,6 +4414,12 @@ class Pantalla_Restaurante_Europeo:
 
                         # Se actualiza la orden en pantalla
                         self.mostrar_orden_europeo()
+
+                        # Se devuelve el foco a la ventana del restaurante
+                        self.ventana_restaurante.focus_force()
+
+                        # Se vuelve a asegurar que las teclas sigan funcionando
+                        self.ventana_restaurante.bind("<Key>", self.mover_chef)
 
                         # Se vuelve a iniciar el temporizador
                         self.actualizar_temporizador_europeo()
