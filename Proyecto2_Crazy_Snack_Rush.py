@@ -4460,7 +4460,10 @@ class Pantalla_Restaurante_Europeo:
 #Clase que contiene la funcionalidad del restaurante Europeo
 class Pantalla_Restaurante_Asiatico:
 
-        def __init__(self, ventana_mapa):
+        def __init__(self, ventana_mapa, nombre_jugador):
+
+                # Se guarda el nombre del jugador actual
+                self.nombre_jugador = nombre_jugador
 
                 # Se obtiene la ruta donde se encuentra la imagen de la cocina asiática 
                 self.BASE_DIR = os.path.dirname(os.path.abspath(__file__))
