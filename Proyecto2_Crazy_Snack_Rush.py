@@ -1,8 +1,10 @@
 #Importación de librerias 
 from tkinter import *
 import tkinter as tk
+import random # Permite escoger recetas e ingredientes de forma aleatoria
 import os #Permite acceder a la ruta donde se encuentran las imagenes 
 from PIL import Image, ImageTk  #Pillow permite para cargar imágenes JPG
+from tkinter import messagebox # permite generar mensajes emergentes 
 
 #Clase que contiene la pantalla principal 
 class Pantalla_Principal:
@@ -43,11 +45,11 @@ class Pantalla_Principal:
         #######
                 # Se coloca la imagen de fondo en el canvas
                 self.canvas.create_image(
-                                        0,
-                                        0,
-                                        image=self.imagen_fondo_tk,
-                                        anchor=NW
-                                        )
+                                                0,
+                                                0,
+                                                image=self.imagen_fondo_tk,
+                                                anchor=NW
+                                                )
                 
         #######
                 # Se define la ruta de la imagen del botón jugar 
@@ -70,6 +72,7 @@ class Pantalla_Principal:
                                                                 550,# Posición del botón en el eje Y
                                                                 image=self.imagen_boton_jugar_tk # Imagen que tendrá el botón
                                                         )
+  
         #######
                 # Evento que permite hacer click sobre la imagen del botón jugar 
                 self.canvas.tag_bind(
@@ -375,12 +378,12 @@ class Pantalla_mapa:
         #######
                 #Se define la ubicación del icono del restaurante americano sobre el mapa 
                 self.punto_americano = puntoMapa(
-                                                self.canvas,
-                                                460,
-                                                370,
-                                                self.imagen_americano_tk,
-                                                self.abrir_americano
-                                                )
+                                                        self.canvas,
+                                                        460,
+                                                        370,
+                                                        self.imagen_americano_tk,
+                                                        self.abrir_americano
+                                                        )
                 
                 # Se coloca el nombre del restaurante Americano
                 self.canvas.create_text(
@@ -941,11 +944,6 @@ class Chef2:
 ##########################
                  # Se muestra la posición actual del chef
                 self.mostrar_posicion()
-##########################
-#########################
-
-
-
 
 #######################################################################################
 
@@ -1115,10 +1113,122 @@ class Freidora:
                 self.columna = columna
 
 #######################################################################################
+# Clase que guarda un ingrediente y su estado (picado, frito, crudo o cocinado) para la receta 
+class Ingrediente_Receta:
+
+        # Constructor de la clase
+        def __init__(self, nombre_ingrediente, estado_requerido):
+
+                # Se cuarda el nombre del ingrediente que pide la receta
+                self.nombre_ingrediente = nombre_ingrediente
+
+                # Se guarda el estado que debe tener el ingrediente: crudo, picado, cocinado o frito
+                self.estado_requerido = estado_requerido
+
+#######################################################################################
+# Clase de la receta del juego
+class Receta:
+
+        
+        def __init__(self, lista_ingredientes, puntos_receta, max_time_receta):
+
+                # Guarda la lista de ingredientes que necesita la receta
+                self.lista_ingredientes = lista_ingredientes
+
+                # Guarda los puntos que vale la receta
+                self.puntos_receta = puntos_receta
+
+                # Guarda el tiempo máximo para entregar la receta
+                self.max_time_receta = max_time_receta
+
+
+#########################################
+
+        # Función que muestra la receta en consola
+        def mostrar_receta(self):
+
+                # Muestra el título de la receta
+                print("Orden solicitada:")
+
+                # Recorre cada ingrediente de la receta
+                for ingrediente in self.lista_ingredientes:
+
+                        # Muestra el nombre y el estado que necesita ese ingrediente
+                        print(ingrediente.nombre_ingrediente, "-", ingrediente.estado_requerido)
+
+                # Muestra los puntos de la receta
+                print("Puntos:", self.puntos_receta)
+
+                # Muestra el tiempo máximo de la receta
+                print("Tiempo máximo:", self.max_time_receta)
+
+#########################################
+
+        # Función que compara la receta solicitada con los ingredientes entregados por el jugador
+        def comparar_receta(self, ingredientes_entregados):
+
+
+                # Se verifica si la cantidad de ingredientes entregados es diferente a la cantidad de ingredientes de la receta
+                if len(ingredientes_entregados) != len(self.lista_ingredientes):
+
+                        # Si la cantidad es diferente, la receta está incorrecta
+                        return False
+
+                # Se recorre cada ingrediente que pide la receta
+                for ingrediente_receta in self.lista_ingredientes:
+
+                        # Se crea una variable para saber si el ingrediente solicitado fue encontrado
+                        ingrediente_encontrado = False
+
+                        # Se muestra el ingrediente de la receta que se está buscando
+                        print("Buscando:", ingrediente_receta.nombre_ingrediente, "-", ingrediente_receta.estado_requerido)
+
+                        # Se muestra la lista completa de ingredientes entregados
+                        print("----- INGREDIENTES ENTREGADOS -----")
+
+                        # Se recorre cada ingrediente que entregó el jugador
+                        for ingrediente_entregado in ingredientes_entregados:
+                                print(
+                                        ingrediente_entregado.nombre_ingrediente,
+                                        "-",
+                                        ingrediente_entregado.estado_requerido
+                                )
+
+                                # Se muestra qué ingrediente entregó el jugador para comparar
+                                print("Comparando con:", ingrediente_entregado.nombre_ingrediente, "-", ingrediente_entregado.estado_requerido)
+
+                                # Se compara si el nombre del ingrediente entregado es igual al nombre del ingrediente solicitado
+                                if ingrediente_receta.nombre_ingrediente == ingrediente_entregado.nombre_ingrediente:
+
+                                        # Se compara el estado requerido con el estado entregado ya convertido al mismo formato
+                                        if ingrediente_receta.estado_requerido ==  ingrediente_entregado.estado_requerido:
+                                                
+                                                # Se encontró una coincidencia
+                                                print("Coincidencia:", ingrediente_entregado.nombre_ingrediente, "-", ingrediente_entregado.estado_requerido)
+
+                                                # Se indica que el ingrediente sí fue encontrado correctamente
+                                                ingrediente_encontrado = True
+
+                # Se verifica si el ingrediente solicitado no fue encontrado
+                        if ingrediente_encontrado == False:
+
+                                # Se muestra qué ingrediente no fue encontrado
+                                print("No encontrado:", ingrediente_receta.nombre_ingrediente, "-", ingrediente_receta.estado_requerido)
+
+                                # Si falta un ingrediente o está en estado incorrecto, la receta está incorrecta
+                                return False
+
+                # Si todos los ingredientes fueron encontrados correctamente, la receta está correcta
+                return True
+
+
+#######################################################################################
 #Clase que contiene la funcionalidad del restaurante americano 
 class Pantalla_Restaurante_Americano:
 
         def __init__(self, ventana_mapa, nombre_jugador):
+
+                self.ventana_mapa = ventana_mapa
 
                 # Se guarda el nombre del jugador actual
                 self.nombre_jugador = nombre_jugador
@@ -1162,6 +1272,42 @@ class Pantalla_Restaurante_Americano:
                 # Se coloca la imagen de fondo en el canvas
                 self.canvas.create_image(0, 0, image=self.imagen_cocina_tk, anchor=NW)
 
+#######
+                
+                # Tiempo inicial de la receta en segundos (1 minuto)
+                self.tiempo_restante = 60
+
+                # Texto que muestra el temporizador en pantalla
+                self.texto_temporizador = self.canvas.create_text(
+
+                                                                        500, # posición del reloj en el eje x 
+
+                                                                        70, # posición del reloj en el eje y 
+
+                                                                        text="01:00", #Formato de como se mostrará el tiempo en pantalla
+
+                                                                        fill="yellow", #color del texto del reloj
+
+                                                                        font=("Arial", 15, "bold")
+                                                                )
+
+                # Inicia la cuenta regresiva
+                self.actualizar_temporizador()              
+
+#######
+                # Ruta de la imagen que se mostrará cuando la receta sea incorrecta
+                ruta_carne_quemada = os.path.join(self.BASE_DIR, "Imagenes", "quemado.png")
+
+                # Se abre la imagen de carne quemada
+                imagen_carne_quemada = Image.open(ruta_carne_quemada)
+
+                # Se ajusta el tamaño de la imagen de la carne quemada 
+                imagen_carne_quemada = imagen_carne_quemada.resize((100, 100))
+
+                # Se convierte la imagen en un formato que Tkinter pueda usar 
+                self.imagen_carne_quemada_tk = ImageTk.PhotoImage(imagen_carne_quemada)
+#######
+
                 # Se crea un texto en el canvas para mostrar el nombre del jugador
                 self.texto_nombre_jugador = self.canvas.create_text(
 
@@ -1201,6 +1347,9 @@ class Pantalla_Restaurante_Americano:
 
                 # Detecta cuando el jugador presiona la tecla "F" para freír ingredientes
                 self.ventana_restaurante.bind("f", self.usar_freidora_americano)
+
+                # Detecta cuando el jugador presiona la tecla E para entregar un ingrediente
+                self.ventana_restaurante.bind("e", self.entregar_ingrediente_americano)
 
 #######
                 # Etiquetas que contiene el nombre de los ingredientes del estante izquierdo
@@ -1267,7 +1416,7 @@ class Pantalla_Restaurante_Americano:
                         [0,1,1,1,1,1,1,1,1,1,1,1,0,0,0,1,0,0,0,0],
 
                         # Fila 12
-                        [0,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0],
+                        [0,1,1,1,1,1,0,1,1,1,1,1,1,1,0,0,0,0,0,0],
 
                         # Fila 13
                         [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
@@ -1330,7 +1479,7 @@ class Pantalla_Restaurante_Americano:
                 # Se guarda el ingrediente que el chef está sosteniendo actualmente
                 self.ingrediente_en_mano = None
 
-#######         
+###############################################       
 
                 # Lista que almacena las posiciones de las cocinas del restaurante americano
                         #Posicione válidas para cocinar la carne 
@@ -1376,7 +1525,22 @@ class Pantalla_Restaurante_Americano:
                                         # Posición al costado de la freidora
                                         Freidora(8, 3)
                                 ]
+                
 #######
+                # Lista vacía donde se guardarán los ingredientes entregados para la orden actual
+                self.ingredientes_entregados = []
+
+                # Lista que almacená las posiciones válidas de la estación de entrega
+                self.estaciones_entrega = [
+
+                                                # Posiciones válidas para la entrega de ingredientes finalizados 
+                                                (10, 6),
+                                                (10, 7),
+                                                (11, 6),
+                                                (11, 7),
+                                        ]
+
+###############################################
 
                 # Se crea el ingrediente carne del restaurante americano
                 self.carne = ingredientes_restaurante_americano(
@@ -1499,7 +1663,388 @@ class Pantalla_Restaurante_Americano:
                 # Detecta cuando el usuario presiona cualquier tecla de dirección 
                 self.ventana_restaurante.bind("<Key>", self.mover_chef)
 
+#########################################
 
+                # Se inicializa el número de la orden actual
+                self.numero_orden = 1
+
+                # Cantidad máxima de órdenes permitidas en este restaurante
+                self.maximo_ordenes = 3
+                
+                # Se genera la receta inicial del restaurante americano
+                self.receta_actual = self.generar_receta_americano()
+
+                # Se llama a la función que muestra la orden actual en pantalla
+                self.mostrar_orden_americano()
+
+
+#########################################
+
+        #Función que muestra la orden que debe preparar el chef en la pantalla 
+        def mostrar_orden_americano(self):
+
+                # Se verifica si ya existe un rectángulo de una orden anterior
+                        #hasattr() es una función de Python que sirve para preguntar si el objeto tiene un atributo
+                        # hasattr(objeto, "atributo") devuelve True y False si ya existe un cuadro donde se coloca la receta lo borra para hacerlo para la siguiente receta
+                if hasattr(self, "cuadro_orden"):
+
+                        # Se elimina el rectángulo anterior para evitar que se dibuje encima
+                        self.canvas.delete(self.cuadro_orden)
+
+                # Se verifica si ya existe el título de una orden anterior
+                        #hasattr() es una función de Python que sirve para preguntar si el objeto tiene un atributo
+                        # hasattr(objeto, "atributo") devuelve True y False si ya existe el título de la orden, lo borra para hacerlo para la siguiente receta
+                if hasattr(self, "titulo_orden"):
+
+                        # Se elimina el título anterior
+                        self.canvas.delete(self.titulo_orden)
+
+                # Se verifica si ya existe el texto de ingredientes de una orden anterior
+                        #hasattr() es una función de Python que sirve para preguntar si el objeto tiene un atributo
+                        # hasattr(objeto, "atributo") devuelve True y False si ya existe el listado con la receta, lo borra para hacerlo para la siguiente receta
+                if hasattr(self, "texto_ingredientes_orden"):
+
+                        # Se elimina el texto anterior
+                        self.canvas.delete(self.texto_ingredientes_orden)
+
+                # Se crea un rectángulo de fondo para mostrar la orden
+                self.cuadro_orden = self.canvas.create_rectangle(
+
+                                                820, # Posición inicial X
+
+                                                10, # Posición inicial Y
+
+                                                995, # Posición final X
+
+                                                150, # Posición final Y
+
+                                                fill="#3B2416", # Color café oscuro
+
+                                                outline="#D2B48C", # Color del borde
+
+                                                width=4 # Grosor del borde
+                                        )
+
+#######
+                # Se crea un texto con el encabezado de la orden
+                self.titulo_orden = self.canvas.create_text(
+
+                                                908, # Posición del texto "orden" en el eje X
+
+                                                25, # Posición del texto "orden"  en el eje Y
+
+                                                text="ORDEN "+ " # " +str(self.numero_orden), # Encabezado de la orden + el consecutivo de la orden 
+
+                                                fill="white",
+
+                                                font=("Arial", 10, "bold")
+                                        )
+
+                # Se crea un texto con los ingredientes solicitados
+                self.texto_ingredientes_orden = self.canvas.create_text(
+
+                        910, # Posición de los ingredientes en el eje X
+
+                        85, # Posición de los ingredientes en el eje Y
+
+                        text=
+                        self.receta_actual.lista_ingredientes[0].nombre_ingrediente + " - " +
+                        self.receta_actual.lista_ingredientes[0].estado_requerido + "\n" +
+
+                        self.receta_actual.lista_ingredientes[1].nombre_ingrediente + " - " +
+                        self.receta_actual.lista_ingredientes[1].estado_requerido + "\n" +
+
+                        self.receta_actual.lista_ingredientes[2].nombre_ingrediente + " - " +
+                        self.receta_actual.lista_ingredientes[2].estado_requerido + "\n" +
+
+                        self.receta_actual.lista_ingredientes[3].nombre_ingrediente + " - " +
+                        self.receta_actual.lista_ingredientes[3].estado_requerido,
+
+                        fill="white",
+
+                        font=("Arial", 10, "bold")
+                )
+
+#########################################
+
+        # Función que genera una receta aleatoria (random) para el restaurante americano
+        def generar_receta_americano(self):
+                
+
+                # Lista de ingredientes que pueden ir fritos
+                ingredientes_fritos = ["Papa", "Carne"]
+
+                # Lista de ingredientes que pueden ir picados
+                ingredientes_picados = ["Tomate", "Cebolla", "Zanahoria", "Remolacha", "Calabaza", "Hongo", "Papa", "Queso"]
+
+                # Lista de ingredientes que pueden ir cocinados
+                ingredientes_cocinados = ["Carne"]
+
+                # Lista de ingredientes que pueden ir crudos
+                ingredientes_crudos = ["Mayonesa", "Lentejas", "Aceituna"]
+
+                # Se escoge un ingrediente frito aleatorio
+                ingrediente_frito = random.choice(ingredientes_fritos)
+
+                # Se escoge un ingrediente picado aleatorio
+                ingrediente_picado = random.choice(ingredientes_picados)
+
+                # Se escoge un ingrediente cocinado aleatorio
+                ingrediente_cocinado = random.choice(ingredientes_cocinados)
+
+                # Se escoge un ingrediente crudo aleatorio
+                ingrediente_crudo = random.choice(ingredientes_crudos)
+
+                # Se crea la lista de ingredientes de la receta
+                lista_ingredientes = [
+
+                        Ingrediente_Receta(ingrediente_frito, "frito(a)"),
+
+                        Ingrediente_Receta(ingrediente_picado, "picado(a)"),
+
+                        Ingrediente_Receta(ingrediente_cocinado, "cocinado(a)"),
+
+                        Ingrediente_Receta(ingrediente_crudo, "crudo(a)")
+                ]
+
+                # Se crea la receta con puntos y tiempo máximo
+                receta = Receta(lista_ingredientes, 60, 60) #100 puntos, 60 segundos
+
+                # Se muestra la receta en consola para probar
+                receta.mostrar_receta()
+
+                # Se retorna la receta creada
+                return receta
+        
+#########################################
+
+        #Función que genera la siguiente receta 
+        def generar_nueva_orden_americano(self):
+
+                # Se verifica si todavía quedan órdenes por generar
+                if self.numero_orden < self.maximo_ordenes: 
+
+                        # Se aumenta el número consecutivo de la orden
+                        self.numero_orden += 1
+
+                        # Se llama a la función que crea recetas de forma aleatoria 
+                        self.receta_actual = self.generar_receta_americano()
+
+                        # Se llama a la funcipon que muestra esa nueva receta en pantalla
+                        self.mostrar_orden_americano()
+                
+                # Si ya se completaron las 3 órdenes
+                else:
+
+                        print("Todas las órdenes americanas fueron completadas")
+
+                        # Muestra un mensaje emergente
+                        messagebox.showinfo(
+                                "Restaurante Americano",
+                                "¡FELICIDADES!\nCompletaste las 3 recetas correctamente"
+                        )
+
+                        # Se cierra la cocina americana
+                        self.ventana_restaurante.destroy()
+
+                        # Se vuelve a mostrar el mapa
+                        self.ventana_mapa.deiconify()
+
+#########################################
+
+        # Función que permite entregar un ingrediente en la estación de entrega
+        def entregar_ingrediente_americano(self, event):
+
+                # Se obtiene la fila actual del chef
+                fila = self.chef.chef_ejey // 50
+
+                # Se obtiene la columna actual del chef
+                columna = self.chef.chef_ejex // 50
+
+                # Se verifica si el chef está en una posición válida de entrega
+                if (fila, columna) not in self.estaciones_entrega:
+
+                        # Se muestra un mensaje si no está en la estación de entrega
+                        print("No estás en la estación de entrega")
+
+                        # Se detiene la función
+                        return
+                
+                # Se verifica si el chef no tiene ingrediente en la mano
+                if self.ingrediente_en_mano == None:
+
+                        # Se muestra un mensaje si no lleva ingrediente
+                        print("No tienes ingrediente para entregar")
+
+                        # Se detiene la función
+                        return
+                
+                # Se crea una copia del ingrediente para guardar exactamente lo que entrego el chef 
+                        # Se guarda el nombre y el estado que tenía al momento de entregarlo
+                ingrediente_entregado = Ingrediente_Receta(
+
+                        # Se guarda el nombre del ingrediente que el chef tiene en la mano
+                        self.ingrediente_en_mano.nombre_ingrediente,
+
+                        # Se guarda el estado actual del ingrediente con el formato que usa la receta
+                        self.ingrediente_en_mano.estado_ingrediente + "(a)"
+                )
+
+       
+                # Se guarda la copia del ingrediente, no el objeto original (puede ser que el chef tomára inicialmente un ingrediente
+                        #  que no era el correcto pero antes de entregarlo se cambio correctamente)
+                self.ingredientes_entregados.append(ingrediente_entregado)
+
+                # Se muestra en consola el ingrediente entregado
+                print(
+                        "Ingrediente entregado:",
+                        ingrediente_entregado.nombre_ingrediente,
+                        "-",
+                        ingrediente_entregado.estado_requerido
+                )
+
+
+                # Se elimina la imagen del ingrediente de la mano del chef
+                self.ingrediente_en_mano.soltar_ingrediente()
+
+                # Se limpia la mano del chef
+                self.ingrediente_en_mano = None
+
+                # Se muestra cuántos ingredientes se han entregado
+                print("Ingredientes entregados:", len(self.ingredientes_entregados))
+
+                # Se verifica si ya se entregó la misma cantidad de ingredientes que pide la receta
+                if len(self.ingredientes_entregados) == len(self.receta_actual.lista_ingredientes):
+
+                        # Se muestra un mensaje para indicar que ya se puede validar la receta completa
+                        print("Validando receta...")
+
+                        # Se guarda el resultado de comparar la receta actual con los ingredientes entregados
+                        receta_correcta = self.receta_actual.comparar_receta(self.ingredientes_entregados)
+
+                        # Se verifica si la receta fue correcta
+                        if receta_correcta == True:
+
+                                # Se calculan los puntos ganados según el tiempo restante (si finaliza la receta faltando 35 segundos gana 35 puntos)
+                                puntos_ganados = self.tiempo_restante
+
+                                # Se suman los puntos ganados al puntaje total del jugador
+                                self.puntaje_jugador += puntos_ganados
+
+                                # Se actualiza el texto del puntaje en pantalla
+                                self.canvas.itemconfig(
+                                                        self.texto_puntaje_jugador,
+                                                        text="Puntaje: " + str(self.puntaje_jugador)
+                                                )
+
+                                # Se muestra en consola cuántos puntos ganó
+                                print("Puntos ganados:", puntos_ganados)
+
+                                # Se limpian los ingredientes entregados para iniciar una nueva orden
+                                self.ingredientes_entregados = []
+
+                                # Se reinicia el tiempo para la nueva orden
+                                self.tiempo_restante = 60
+
+                                # Se genera una nueva orden
+                                self.generar_nueva_orden_americano()
+
+                        # Si la receta entregada no coincide con la receta solicitada
+                        else:
+
+                                # Se indica que la receta fue incorrecta
+                                print("Receta incorrecta")
+
+                                # Se elimina la imagen de la receta incorrecta si ya existía
+                                if hasattr(self, "imagen_error"):
+
+                                        # Se elimina la imagen anterior
+                                        self.canvas.delete(self.imagen_error)
+
+                                # Se muestra la imagen de carne quemada
+                                self.imagen_error = self.canvas.create_image(
+                                                                                500,
+                                                                                120,
+                                                                                image=self.imagen_carne_quemada_tk
+                                                                        )
+
+                                # El mensaje de receta incorrecta desaparece después de 3 segundos
+                                self.ventana_restaurante.after(
+                                                                3000,
+                                                                self.ocultar_mensaje_error
+                                                        )
+                                # Se limpian los ingredientes entregados para intentar otra vez
+                                self.ingredientes_entregados = []
+
+                # Si todavía no se han entregado todos los ingredientes, no se valida la receta
+                else:
+                         # Se muestra que todavía faltan ingredientes
+                        print("Todavía faltan ingredientes para validar la receta")
+                        
+
+#########################################
+        # Función que elimina el mensaje de receta incorrecta
+        def ocultar_mensaje_error(self):
+
+                # Se valida si en la pantalla aparece la imagen de receta incorrecta 
+                if hasattr(self, "imagen_error"):
+
+                        # Elimina la imagen
+                        self.canvas.delete(self.imagen_error)        
+#########################################
+        
+
+        # Función que actualiza el temporizador cada segundo
+        def actualizar_temporizador(self):
+
+                # Se calcula los minutos restantes
+                minutos = self.tiempo_restante // 60
+
+                # Se calcula los segundos restantes
+                segundos = self.tiempo_restante % 60
+
+                # Se actualiza el texto del temporizador
+                self.canvas.itemconfig(
+
+                                        self.texto_temporizador,
+
+                                        text=f"{minutos:02d}:{segundos:02d}"
+                                )
+
+                # Se verifica si todavía queda tiempo
+                if self.tiempo_restante > 0:
+
+                        # Se resta un segundo
+                        self.tiempo_restante -= 1
+
+                        # Se vuelve a ejecutar la función dentro de 1 segundo
+                        self.ventana_restaurante.after(
+                                                        1000,
+                                                        self.actualizar_temporizador
+                                                )
+
+                else:
+
+                        # Mensaje cuando se acaba el tiempo
+                        messagebox.showinfo(
+                                                "Tiempo agotado",
+                                                "La orden ha expirado"
+                                        )
+                        
+                        # Se limpian los ingredientes entregados porque la orden falló
+                        self.ingredientes_entregados = []
+
+                        # Se reinicia el tiempo para la nueva orden
+                        self.tiempo_restante = 60
+
+                        # Se genera otra receta, pero se mantiene el mismo número de orden
+                        self.receta_actual = self.generar_receta_americano()
+
+                        # Se actualiza la orden en pantalla
+                        self.mostrar_orden_americano()
+
+                        # Se vuelve a iniciar el temporizador
+                        self.actualizar_temporizador()
 #########################################
 
         # Función que determina cual tecla se presionó el jugador para mover el chef
@@ -2191,6 +2736,8 @@ class Pantalla_Restaurante_Europeo:
 
         def __init__(self, ventana_mapa, nombre_jugador):
 
+                self.ventana_mapa = ventana_mapa
+
                 # Se guarda el nombre del jugador actual
                 self.nombre_jugador = nombre_jugador
 
@@ -2233,6 +2780,35 @@ class Pantalla_Restaurante_Europeo:
                 # Se coloca la imagen de fondo en el canvas
                 self.canvas.create_image(0, 0, image=self.imagen_cocina_tk, anchor=NW)
 
+#######
+                # Tiempo inicial de la receta en segundos
+                self.tiempo_restante = 60
+
+                # Texto que muestra el temporizador en pantalla
+                self.texto_temporizador = self.canvas.create_text(
+                                                                        500, # Posición del reloj en el eje x
+                                                                        70, #Posición del reloj en el eje y
+                                                                        text="01:00", # Formato en el que se visualizará el reloj 
+                                                                        fill="yellow", # Color del reloj 
+                                                                        font=("Arial", 15, "bold")
+                                                                )
+
+                # Inicia la cuenta regresiva del restaurante europeo
+                self.actualizar_temporizador_europeo()
+#######
+                # Ruta de la imagen que se mostrará cuando la receta sea incorrecta
+                ruta_carne_quemada = os.path.join(self.BASE_DIR, "Imagenes", "quemado.png")
+
+                # Se abre la imagen de carne quemada
+                imagen_carne_quemada = Image.open(ruta_carne_quemada)
+
+                # Se ajusta el tamaño de la imagen de la carne quemada 
+                imagen_carne_quemada = imagen_carne_quemada.resize((100, 100))
+
+                # Se convierte la imagen en un formato que Tkinter pueda usar 
+                self.imagen_carne_quemada_tk = ImageTk.PhotoImage(imagen_carne_quemada)
+#######
+
                                 # Se crea un texto en el canvas para mostrar el nombre del jugador
                 self.texto_nombre_jugador = self.canvas.create_text(
 
@@ -2264,49 +2840,49 @@ class Pantalla_Restaurante_Europeo:
                 # Creación de matriz para el restaurante europeo
                 self.matriz_movimiento_europeo = [
 
-                        # Fila 0
-                        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                                                        # Fila 0
+                                                        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
 
-                        # Fila 1
-                        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                                                        # Fila 1
+                                                        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
 
-                        # Fila 2
-                        [0,0,0,0,1,1,0,0,1,1,0,0,1,1,1,1,1,0,0,0],
+                                                        # Fila 2
+                                                        [0,0,0,0,1,1,0,0,1,1,0,0,1,1,1,1,1,0,0,0],
 
-                        # Fila 3
-                        [0,1,1,0,1,1,0,1,1,1,1,1,1,1,1,1,1,0,0,0],
+                                                        # Fila 3
+                                                        [0,1,1,0,1,1,0,1,1,1,1,1,1,1,1,1,1,0,0,0],
 
-                        # Fila 4
-                        [0,0,0,0,1,1,1,1,1,0,0,1,1,1,1,1,1,0,0,0],
+                                                        # Fila 4
+                                                        [0,0,0,0,1,1,1,1,1,0,0,1,1,1,1,1,1,0,0,0],
 
-                        # Fila 5
-                        [0,0,0,0,1,1,0,1,1,0,0,1,1,1,1,1,0,0,0,0],
+                                                        # Fila 5
+                                                        [0,0,0,0,1,1,0,1,1,0,0,1,1,1,1,1,0,0,0,0],
 
-                        # Fila 6
-                        [0,0,0,0,1,1,1,1,1,0,0,1,1,1,1,1,0,0,0,0],
+                                                        # Fila 6
+                                                        [0,0,0,0,1,1,1,1,1,0,0,1,1,1,1,1,0,0,0,0],
 
-                        # Fila 7
-                        [0,0,0,0,1,1,1,1,1,0,0,1,1,1,1,1,0,0,0,0],
+                                                        # Fila 7
+                                                        [0,0,0,0,1,1,1,1,1,0,0,1,1,1,1,1,0,0,0,0],
 
-                        # Fila 8
-                        [0,0,0,1,1,1,1,1,1,0,0,1,1,1,1,1,0,0,0,0],
+                                                        # Fila 8
+                                                        [0,0,0,1,1,1,1,1,1,0,0,1,1,1,1,1,0,0,0,0],
 
-                        # Fila 9
-                        [0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0],
+                                                        # Fila 9
+                                                        [0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0],
 
-                        # Fila 10
-                        [0,0,0,1,1,0,0,1,1,1,1,1,1,1,1,1,0,0,0,0],
+                                                        # Fila 10
+                                                        [0,0,0,1,1,0,0,1,1,1,1,1,1,1,1,1,0,0,0,0],
 
-                        # Fila 11
-                        [0,0,0,1,1,1,1,1,1,0,0,1,1,1,0,1,1,0,0,0],
+                                                        # Fila 11
+                                                        [0,0,0,1,1,1,1,1,1,0,0,1,1,1,0,1,1,0,0,0],
 
-                        # Fila 12
-                        [0,0,0,1,1,1,1,1,1,0,0,1,1,1,1,1,0,0,0,0],
+                                                        # Fila 12
+                                                        [0,0,0,1,1,1,1,1,1,0,0,1,1,1,1,1,0,0,0,0],
 
-                        # Fila 13
-                        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+                                                        # Fila 13
+                                                        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 
-                        ]
+                                                        ]
 
                 #Se dibuja la cuadrícula sobre la imagen de la cocina europea 
                 #self.dibujar_cuadricula()
@@ -2319,8 +2895,24 @@ class Pantalla_Restaurante_Europeo:
 
                 # Se coloca como chef activo el chef #1
                 self.chef = self.chef1
+
+                # Se inicializa el número de la orden actual
+                self.numero_orden = 1
+
+                # Cantidad máxima de órdenes permitidas en este restaurante
+                self.maximo_ordenes = 3
+
+                # Se genera la receta inicial del restaurante europeo
+                self.receta_actual = self.generar_receta_europeo()
+
+                # Se llama a la función  muestra la orden (receta) en pantalla
+                self.mostrar_orden_europeo()
+
+                # Lista donde se almacenan los ingredientes entregados por el jugador
+                self.ingredientes_entregados = []
+
 ####### 
-                # Etiquetas estante izquierdo
+                # Etiquetas de los ingredientes del estante izquierdo
 
                 self.canvas.create_text(170, 140, text="Carne", fill="white", font=("Arial", 8, "bold"))
 
@@ -2335,7 +2927,7 @@ class Pantalla_Restaurante_Europeo:
                 self.canvas.create_text(120, 395, text="Papa", fill="white", font=("Arial", 8, "bold"))
 
 #######   
-                # Etiquetas estante derecho
+                # Etiquetas  de los ingredientes del estante derecho
 
                 self.canvas.create_text(810, 345, text="Camarones", fill="white", font=("Arial", 8, "bold"))
 
@@ -2436,7 +3028,37 @@ class Pantalla_Restaurante_Europeo:
                                         # Posición derecha frente a la freidora
                                         Freidora(6, 15)
 
-                                ]                 
+                                ]            
+
+#######
+                # Lista vacía donde se guardarán los ingredientes entregados para la orden actual
+                self.ingredientes_entregados = []
+
+                # Lista que almacena las posiciones válidas de la estación de entrega europea
+                self.estaciones_entrega = [
+
+                        # Posición válida frente a la estación de entrega
+                        (9, 14),
+
+                        # Posición válida frente a la estación de entrega
+                        (9, 15),
+
+                        # Posición válida frente a la estación de entrega
+                        (10, 14),
+
+                        # Posición válida frente a la estación de entrega
+                        (10, 15),
+
+                         # Posición válida frente a la estación de entrega
+                        (11, 13),
+
+                        # Posición válida frente a la estación de entrega
+                        (11, 15),
+
+                        # Posición válida frente a la estación de entrega
+                        (11, 16)
+                ]
+                
 #######
                 # Se crea el ingrediente papa del restaurante europeo
                 self.papa = ingredientes_restaurante_americano(
@@ -2528,6 +3150,10 @@ class Pantalla_Restaurante_Europeo:
 
                 # Detecta cuando el jugador presiona la tecla "F" para freír ingredientes
                 self.ventana_restaurante.bind("f", self.usar_freidora_europeo)
+
+                # Detecta cuando el jugador presiona la tecla E para entregar un ingrediente
+                self.ventana_restaurante.bind("e", self.entregar_ingrediente_europeo)
+
 
 
 #######
@@ -2652,6 +3278,121 @@ class Pantalla_Restaurante_Europeo:
 
 
 ##########################################
+        # Función que genera una receta aleatoria para el restaurante europeo
+        def generar_receta_europeo(self):
+
+                # Lista de ingredientes que pueden ir fritos en el restaurante europeo
+                ingredientes_fritos = ["Papa", "Pescado", "Camaron", "Carne"]
+
+                # Lista de ingredientes que pueden ir picados en el restaurante europeo
+                ingredientes_picados = ["Papa", "Pan", "Queso_cubo", "lechuga", "Tomate", "Albahaca"]
+
+                # Lista de ingredientes que pueden ir cocinados en el restaurante europeo
+                ingredientes_cocinados = ["Carne", "Camaron", "Pescado", "Jamon"]
+
+                # Lista de ingredientes que pueden entregarse crudos en el restaurante europeo
+                ingredientes_crudos = ["Pan", "Queso_cubo", "lechuga", "Tomate", "Albahaca"]
+
+                # Se escoge un ingrediente frito aleatorio
+                ingrediente_frito = random.choice(ingredientes_fritos)
+
+                # Se escoge un ingrediente picado aleatorio
+                ingrediente_picado = random.choice(ingredientes_picados)
+
+                # Se escoge un ingrediente cocinado aleatorio
+                ingrediente_cocinado = random.choice(ingredientes_cocinados)
+
+                # Se escoge un ingrediente crudo aleatorio
+                ingrediente_crudo = random.choice(ingredientes_crudos)
+
+                # Se crea la lista de ingredientes de la receta europea
+                lista_ingredientes = [
+
+                        # Ingrediente que debe entregarse frito
+                        Ingrediente_Receta(ingrediente_frito, "frito(a)"),
+
+                        # Ingrediente que debe entregarse picado
+                        Ingrediente_Receta(ingrediente_picado, "picado(a)"),
+
+                        # Ingrediente que debe entregarse cocinado
+                        Ingrediente_Receta(ingrediente_cocinado, "cocinado(a)"),
+
+                        # Ingrediente que debe entregarse crudo
+                        Ingrediente_Receta(ingrediente_crudo, "crudo(a)")
+                ]
+
+                # Se crea la receta europea con puntos y tiempo máximo
+                receta = Receta(lista_ingredientes, 50, 50)
+
+                # Se muestra la receta en consola para probar
+                receta.mostrar_receta()
+
+                # Se retorna la receta creada
+                return receta
+        
+##########################################   
+     
+        # Función que muestra la orden que debe preparar el chef en la pantalla
+        def mostrar_orden_europeo(self):
+
+                # Se crea un rectángulo de fondo para mostrar la orden
+                self.canvas.create_rectangle(
+
+                                                820, # Posición inicial X
+
+                                                10, # Posición inicial Y
+
+                                                995, # Posición final X
+
+                                                150, # Posición final Y
+
+                                                fill="#3B2416", # Color café oscuro
+
+                                                outline="#D2B48C", # Color del borde
+
+                                                width=4 # Grosor del borde
+                                        )
+
+                # Se crea un texto con el encabezado de la orden
+                self.canvas.create_text(
+
+                                                900, # Posición del texto en X
+
+                                                25, # Posición del texto en Y
+
+                                                text="ORDEN # " + str(self.numero_orden),
+
+                                                fill="white",
+
+                                                font=("Arial", 10, "bold")
+                                        )
+
+                # Se crea un texto con los ingredientes solicitados
+                self.canvas.create_text(
+
+                        910, # Posición de los ingredientes en X
+
+                        85, # Posición de los ingredientes en Y
+
+                        text=
+
+                        self.receta_actual.lista_ingredientes[0].nombre_ingrediente + " - " +
+                        self.receta_actual.lista_ingredientes[0].estado_requerido + "\n" +
+
+                        self.receta_actual.lista_ingredientes[1].nombre_ingrediente + " - " +
+                        self.receta_actual.lista_ingredientes[1].estado_requerido + "\n" +
+
+                        self.receta_actual.lista_ingredientes[2].nombre_ingrediente + " - " +
+                        self.receta_actual.lista_ingredientes[2].estado_requerido + "\n" +
+
+                        self.receta_actual.lista_ingredientes[3].nombre_ingrediente + " - " +
+                        self.receta_actual.lista_ingredientes[3].estado_requerido,
+
+                        fill="white",
+
+                        font=("Arial", 10, "bold")
+                )
+##########################################
 
         # Función que verifica si el chef está ubicado en una cocina
         def esta_en_cocina(self):
@@ -2746,6 +3487,167 @@ class Pantalla_Restaurante_Europeo:
                                 #Se actualiza el estado del ingrediente del chef a none tras cocinarlo no siendo una proteina 
                                 self.ingrediente_en_mano = None
 
+##########################################
+
+        # Función que permite entregar un ingrediente en la estación de entrega europea
+        def entregar_ingrediente_europeo(self, event):
+
+                # Se obtiene la fila actual del chef
+                fila = self.chef.chef_ejey // 50
+
+                # Se obtiene la columna actual del chef
+                columna = self.chef.chef_ejex // 50
+
+                # Se verifica si el chef está en una posición válida de entrega
+                if (fila, columna) not in self.estaciones_entrega:
+
+                        # Se muestra un mensaje si no está en la estación de entrega
+                        print("No estás en la estación de entrega europea")
+
+                        # Se detiene la función
+                        return
+
+                # Se verifica si el chef no tiene ingrediente en la mano
+                if self.ingrediente_en_mano == None:
+
+                        # Se muestra un mensaje si no lleva ingrediente
+                        print("No tienes ingrediente para entregar")
+
+                        # Se detiene la función
+                        return
+
+                # Se crea una copia del ingrediente entregado
+                ingrediente_entregado = Ingrediente_Receta(
+
+                        # Se guarda el nombre del ingrediente que el chef tiene en la mano
+                        self.ingrediente_en_mano.nombre_ingrediente,
+
+                        # Se guarda el estado actual del ingrediente con el formato que usa la receta
+                        self.ingrediente_en_mano.estado_ingrediente + "(a)"
+                )
+
+                # Se guarda la copia del ingrediente entregado
+                self.ingredientes_entregados.append(ingrediente_entregado)
+
+                # Se muestra en consola el ingrediente entregado
+                print(
+                        "Ingrediente entregado:",
+                        ingrediente_entregado.nombre_ingrediente,
+                        "-",
+                        ingrediente_entregado.estado_requerido
+                )
+
+                # Se elimina la imagen del ingrediente de la mano del chef
+                self.ingrediente_en_mano.soltar_ingrediente()
+
+                # Se limpia la mano del chef
+                self.ingrediente_en_mano = None
+
+                # Se muestra cuántos ingredientes se han entregado
+                print("Ingredientes entregados:", len(self.ingredientes_entregados))
+
+                # Se verifica si ya se entregó la misma cantidad de ingredientes que pide la receta
+                if len(self.ingredientes_entregados) == len(self.receta_actual.lista_ingredientes):
+
+                        # Se muestra un mensaje para indicar que ya se puede validar la receta completa
+                        print("Validando receta europea...")
+
+                        # Se guarda el resultado de comparar la receta actual con los ingredientes entregados
+                        receta_correcta = self.receta_actual.comparar_receta(self.ingredientes_entregados)
+
+                        # Se verifica si la receta fue correcta
+                        if receta_correcta == True:
+
+                                # Se muestra que la receta fue correcta
+                                print("Receta europea correcta")
+
+                                # Se calculan los puntos ganados según el tiempo restante
+                                puntos_ganados = self.tiempo_restante
+
+                                # Se suman los puntos al puntaje total
+                                self.puntaje_jugador += puntos_ganados
+
+                                # Se actualiza el texto del puntaje
+                                self.canvas.itemconfig(
+                                                        self.texto_puntaje_jugador,
+                                                        text="Puntaje: " + str(self.puntaje_jugador)
+                                                )
+
+                                # Se muestra en consola cuántos puntos ganó
+                                print("Puntos ganados en restaurante europeo:", puntos_ganados)
+
+                                # Se limpian los ingredientes entregados para iniciar una nueva orden
+                                self.ingredientes_entregados = []
+
+                                # Se reinicia el tiempo para la nueva orden europea
+                                self.tiempo_restante = 60
+                                
+                                # Se genera una nueva orden europea
+                                self.generar_nueva_orden_europeo()
+
+                        # Si la receta entregada no coincide con la receta solicitada
+                        else:
+
+                                # Se muestra que la receta fue incorrecta
+                                print("Receta europea incorrecta")
+
+                                # Se elimina la imagen de receta incorrecta si existe
+                                if hasattr(self, "imagen_error"):
+
+                                        self.canvas.delete(self.imagen_error)
+                                        
+                                # Se muestra la imagen de carne quemada
+                                self.imagen_error = self.canvas.create_image(
+                                                                                500,
+                                                                                120,
+                                                                                image=self.imagen_carne_quemada_tk
+                                                                        )
+                                # El mensaje de receta incorrecta desaparece después de 3 segundos
+                                self.ventana_restaurante.after(3000,self.ocultar_mensaje_error)
+
+
+                                # Se limpian los ingredientes entregados para intentar otra vez
+                                self.ingredientes_entregados = []
+                
+                # Si todavía no se han entregado todos los ingredientes, no se valida la receta
+                else:
+
+                        # Se muestra que todavía faltan ingredientes
+                        print("Todavía faltan ingredientes para validar la receta")
+
+##########################################
+        # Función que genera la siguiente receta europea
+        def generar_nueva_orden_europeo(self):
+
+                # Se verifica si todavía quedan órdenes por generar
+                if self.numero_orden < self.maximo_ordenes:
+                
+                        # Se aumenta el número consecutivo de la orden
+                        self.numero_orden += 1
+
+                        # Se genera una nueva receta europea aleatoria
+                        self.receta_actual = self.generar_receta_europeo()
+
+                        # Se muestra la nueva orden europea en pantalla
+                        self.mostrar_orden_europeo()
+
+                # Si ya se completaron las 3 órdenes
+                else:
+
+                        print("Todas las órdenes americanas fueron completadas")
+
+                        # Muestra un mensaje emergente
+                        messagebox.showinfo(
+                                "Restaurante Europeo",
+                                "¡FELICIDADES!\nCompletaste las 3 recetas correctamente")
+
+                        # Cierra la cocina americana
+                        self.ventana_restaurante.destroy()
+
+                        # Vuelve a mostrar el mapa
+                        self.ventana_mapa.deiconify()
+
+                
 ##########################################
         # Función que verifica si el chef está en una tabla de picar
         def esta_en_tabla_picar(self):
@@ -2956,6 +3858,15 @@ class Pantalla_Restaurante_Europeo:
 
 
 ##########################################
+        # Función que elimina la imagen de receta incorrecta
+        def ocultar_mensaje_error(self):
+
+                # Verifica que exista la imagen
+                if hasattr(self, "imagen_error"):
+
+                        # Elimina la imagen
+                        self.canvas.delete(self.imagen_error)
+##########################################
 
         #Función que permite el cambio de chef en el restaurante 
         def cambiar_chef(self, event):
@@ -3115,6 +4026,54 @@ class Pantalla_Restaurante_Europeo:
 
                         print("No hay ingrediente para tomar")
                                
+
+##########################################
+        # Función que actualiza el temporizador del restaurante europeo
+        def actualizar_temporizador_europeo(self):
+
+                # Se calculan los minutos restantes
+                minutos = self.tiempo_restante // 60
+
+                # Se calculan los segundos restantes
+                segundos = self.tiempo_restante % 60
+
+                # Se actualiza el texto del temporizador
+                self.canvas.itemconfig(
+                                        self.texto_temporizador,
+                                        text=f"{minutos:02d}:{segundos:02d}"
+                                )
+
+                # Se verifica si todavía queda tiempo
+                if self.tiempo_restante > 0:
+
+                        # Se resta un segundo
+                        self.tiempo_restante -= 1
+
+                        # Se vuelve a ejecutar la función dentro de 1 segundo
+                        self.ventana_restaurante.after(
+                                                                1000,
+                                                                self.actualizar_temporizador_europeo
+                                                        )
+
+                else:
+
+                        # Se muestra que el tiempo terminó
+                        print("Tiempo agotado en restaurante europeo")
+
+                        # Se limpian los ingredientes entregados
+                        self.ingredientes_entregados = []
+
+                        # Se reinicia el tiempo
+                        self.tiempo_restante = 60
+
+                        # Se genera otra receta europea sin aumentar el número de orden
+                        self.receta_actual = self.generar_receta_europeo()
+
+                        # Se actualiza la orden en pantalla
+                        self.mostrar_orden_europeo()
+
+                        # Se vuelve a iniciar el temporizador
+                        self.actualizar_temporizador_europeo()
 
 ##########################################
 
